@@ -18,7 +18,7 @@ class SecretManager {
     uint8_t secretCount = 0;
 
   public:
-    bool start();
+    void start();
     void end();
     bool isActive();
 
