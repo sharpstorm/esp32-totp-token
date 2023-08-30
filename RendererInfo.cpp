@@ -20,6 +20,7 @@ void InfoRenderer::renderInit() {
   getRefVoltage();
   timeStamp = 0;
   page = 0;
+  secretManager.start();
 }
 
 void InfoRenderer::renderLoop() {
@@ -33,6 +34,12 @@ void InfoRenderer::renderLoop() {
         break;
       case INFO_MENU_TIME:
         renderTime();
+        break;
+      case INFO_MENU_UNIX_TIME:
+        renderUnixTime();
+        break;
+      case INFO_MENU_SECRETS:
+        renderSecrets();
         break;
       default:
         break;
@@ -59,12 +66,28 @@ void InfoRenderer::renderTime() {
   Util::drawLocalTime(tft, 16, 72);
 }
 
+void InfoRenderer::renderUnixTime() {
+  tft->setTextDatum(TL_DATUM);
+  tft->setTextColor(TFT_PINK);
+  tft->drawString("Unix Time:", 16, 52);
+  tft->setTextColor(TFT_CYAN);
+  Util::drawUnixTime(tft, 16, 72);
+}
+
+void InfoRenderer::renderSecrets() {
+  tft->setTextDatum(TL_DATUM);
+  tft->setTextColor(TFT_PINK);
+  tft->drawString("Secret Count:", 16, 52);
+  tft->drawString(String(secretManager.getSecretCount()), 180, 52);
+}
+
 void InfoRenderer::handleTopButton() {
-  page = (page + 1) % 2;
+  page = (page + 1) % 4;
 }
 
 void InfoRenderer::handleBottomButton() {
   digitalWrite(ADC_EN, LOW);
+  secretManager.end();
   screenMutator->setState(MENU_STATE_MAIN);
 }
 

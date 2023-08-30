@@ -1,12 +1,10 @@
 #include "RendererSyncMenu.h"
 
 #include "WiFi.h"
-#include "time.h"
+
 #include "util.h"
 #include "Config.h"
-
-#define NTP_SERVER      "pool.ntp.org"
-#define GMT_OFFSET_SECS 28800
+#include "src/Time/TimeManager.h"
 
 SyncMenuRenderer::SyncMenuRenderer(TFT_eSPI *tftRef, ScreenManagerMutator *screenMutator):
   tft(tftRef), screenMutator(screenMutator) {}
@@ -40,7 +38,16 @@ void SyncMenuRenderer::renderInit() {
   tft->setTextColor(TFT_GREEN);
   tft->drawString("> Syncing Time", 16, 72);
 
-  configTime(GMT_OFFSET_SECS, 0, NTP_SERVER);
+  if (!TimeManager::getInstance()->syncTime()) {
+    tft->fillRect(16, 32, 200, 40, TFT_BLACK);
+    tft->setTextColor(TFT_RED);
+    tft->drawString("NTP Sync Failed", 16, 32);
+
+    Util::espDelay(3000);
+    screenMutator->setState(MENU_STATE_MAIN);
+    return;
+  }
+
   Util::drawLocalTime(tft, 16, 92);
   tft->fillRect(16, 72, 200, 20, TFT_BLACK);
   tft->setTextColor(TFT_CYAN);
@@ -60,7 +67,7 @@ bool SyncMenuRenderer::attemptConnection() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    if (millis() - timeSinceConnection > 5000) {
+    if (millis() - timeSinceConnection > 10000) {
       return false;
     }
   }

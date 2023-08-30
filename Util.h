@@ -5,6 +5,7 @@
 
 #include <TFT_eSPI.h>
 #include "time.h"
+#include "src/Time/TimeManager.h"
 
 class Util {
   public:
@@ -12,10 +13,12 @@ class Util {
     static TimeoutFunction espDelay;
 
     static void drawLocalTime(TFT_eSPI *tft, int x, int y) {
-      struct tm timeinfo;
-      if(!getLocalTime(&timeinfo)){
+      TimeData timeDat = TimeManager::getInstance()->getTime();
+      if (!timeDat.isValid()) {
         return;
       }
+
+      tm timeinfo = timeDat.toTime();
     
       char buffer1[25];
       char buffer2[25];
@@ -25,6 +28,18 @@ class Util {
       tft->fillRect(x, y, 200, 40, TFT_BLACK);
       tft->drawString(buffer1, x, y);
       tft->drawString(buffer2, x, y + 20);
+    }
+
+    static void drawUnixTime(TFT_eSPI *tft, int x, int y) {
+      TimeData timeDat = TimeManager::getInstance()->getTime();
+      if (!timeDat.isValid()) {
+        return;
+      }
+
+      tm timeinfo = timeDat.toTime();
+    
+      tft->fillRect(x, y, 200, 40, TFT_BLACK);
+      tft->drawString(String(timeDat.unix()), x, y);
     }
 };
 

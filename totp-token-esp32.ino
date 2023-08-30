@@ -6,6 +6,7 @@
 #include "time.h"
 #include "ScreenManager.h"
 #include "Util.h"
+#include "SPIFFS.h"
 
 #include "driver/rtc_io.h"
 
@@ -49,6 +50,7 @@ void setup() {
   WiFi.setSleep(true);
   WiFi.mode(WIFI_OFF);
   btStop();
+  SPIFFS.begin(true);
   Serial.begin(115200);
   Serial.println("Token Debug Start");
 
