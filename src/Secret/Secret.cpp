@@ -5,15 +5,15 @@
 Secret::Secret(uint16_t secretBitLen): secretBitLen(secretBitLen) {
   int byteLen = ceilByteLen(secretBitLen);
   if (secretBitLen > 0) {
-    secret = (byte*) malloc((size_t) byteLen);
+    secret = (uint8_t*) malloc((size_t) byteLen);
   } else {
     secret = nullptr;
   }
 }
 
 Secret::Secret(const Secret &other): secretBitLen(other.secretBitLen), name(other.name) {
-  if (secretBitLen > 0) {
-    secret = (byte*) malloc((size_t) ceilByteLen(other.secretBitLen));
+  if (other.secretBitLen > 0) {
+    secret = (uint8_t*) malloc((size_t) ceilByteLen(other.secretBitLen));
     memcpy(secret, other.secret, ceilByteLen(other.secretBitLen));
   } else {
     secret = nullptr;
@@ -27,7 +27,7 @@ Secret::~Secret() {
   }
 }
 
-byte* Secret::get() {
+uint8_t* Secret::get() {
   return secret;
 }
 

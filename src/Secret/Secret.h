@@ -5,12 +5,11 @@
 
 #include "Arduino.h"
 #include <stdint.h>
-#define byte uint8_t
 
 class Secret {
   private:
     uint16_t secretBitLen;
-    byte *secret;
+    uint8_t *secret;
     String name;
 
   public:
@@ -18,7 +17,7 @@ class Secret {
     Secret(const Secret &other);
     ~Secret();
 
-    byte *get();
+    uint8_t *get();
     const uint16_t bitLen();
     const uint8_t byteLen();
     bool isValid();

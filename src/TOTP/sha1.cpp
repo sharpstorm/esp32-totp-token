@@ -14,17 +14,17 @@ const uint8_t sha1InitState[] = {
   0xf0,0xe1,0xd2,0xc3  // H4
 };
 
-void Sha1Class::init(void) {
-  memcpy(state.b,sha1InitState,HASH_LENGTH);
+void SHA1::resetState() {
+  memcpy(state.b, sha1InitState,HASH_LENGTH);
   byteCount = 0;
   bufferOffset = 0;
 }
 
-uint32_t Sha1Class::rol32(uint32_t number, uint8_t bits) {
-  return ((number << bits) | (number >> (32-bits)));
+uint32_t SHA1::rol32(uint32_t number, uint8_t bits) {
+  return ((number << bits) | (uint32_t)(number >> (32-bits)));
 }
 
-void Sha1Class::hashBlock() {
+void SHA1::hashBlock() {
   uint8_t i;
   uint32_t a,b,c,d,e,t;
 
@@ -61,7 +61,7 @@ void Sha1Class::hashBlock() {
   state.w[4] += e;
 }
 
-void Sha1Class::addUncounted(uint8_t data) {
+void SHA1::addUncounted(uint8_t data) {
   buffer.b[bufferOffset ^ 3] = data;
   bufferOffset++;
   if (bufferOffset == BLOCK_LENGTH) {
@@ -70,15 +70,21 @@ void Sha1Class::addUncounted(uint8_t data) {
   }
 }
 
-__WRITE_RESULT Sha1Class::write(uint8_t data) {
+void SHA1::write(uint8_t data) {
   ++byteCount;
   addUncounted(data);
 
-  __WRITE_RETURN(1);
+  return;
 }
 
-void Sha1Class::pad() {
-  // Implement SHA-1 padding (fips180-2 §5.1.1)
+void SHA1::writeArray(uint8_t *buffer, uint8_t size){
+    while (size--) {
+        write(*buffer++);
+    }
+}
+
+void SHA1::pad() {
+  // Implement SHA-1 padding (fips180-2 - 5.1.1)
 
   // Pad with 0x80 followed by 0x00 until the end of the block
   addUncounted(0x80);
@@ -95,13 +101,13 @@ void Sha1Class::pad() {
   addUncounted(byteCount << 3);
 }
 
-
-uint8_t* Sha1Class::result(void) {
+uint8_t* SHA1::result() {
   // Pad to complete the last block
   pad();
-  
+
   // Swap byte order back
-  for (int i=0; i<5; i++) {
+  uint8_t i;
+  for (i=0; i<5; i++) {
     uint32_t a,b;
     a=state.w[i];
     b=a<<24;
@@ -110,7 +116,7 @@ uint8_t* Sha1Class::result(void) {
     b|=a>>24;
     state.w[i]=b;
   }
-  
+
   // Return pointer to hash (20 characters)
   return state.b;
 }
@@ -118,33 +124,33 @@ uint8_t* Sha1Class::result(void) {
 #define HMAC_IPAD 0x36
 #define HMAC_OPAD 0x5c
 
-void Sha1Class::initHmac(const uint8_t* key, int keyLength) {
+void SHA1::initHmac(const uint8_t* key, uint8_t keyLength) {
   uint8_t i;
   memset(keyBuffer,0,BLOCK_LENGTH);
   if (keyLength > BLOCK_LENGTH) {
     // Hash long keys
-    init();
+    resetState();
     for (;keyLength--;) write(*key++);
     memcpy(keyBuffer,result(),HASH_LENGTH);
   } else {
     // Block length keys are used as is
     memcpy(keyBuffer,key,keyLength);
   }
+
   // Start inner hash
-  init();
+  resetState();
   for (i=0; i<BLOCK_LENGTH; i++) {
     write(keyBuffer[i] ^ HMAC_IPAD);
   }
 }
 
-uint8_t* Sha1Class::resultHmac(void) {
+uint8_t* SHA1::resultHmac() {
   uint8_t i;
   // Complete inner hash
   memcpy(innerHash,result(),HASH_LENGTH);
   // Calculate outer hash
-  init();
+  resetState();
   for (i=0; i<BLOCK_LENGTH; i++) write(keyBuffer[i] ^ HMAC_OPAD);
   for (i=0; i<HASH_LENGTH; i++) write(innerHash[i]);
   return result();
 }
-Sha1Class Sha1;

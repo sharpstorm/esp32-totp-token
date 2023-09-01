@@ -1,52 +1,39 @@
-#ifndef Sha1_h
-#define Sha1_h
-
 #include <inttypes.h>
-#include "Print.h"
-
-#if ARDUINO < 100
-#define __WRITE_RESULT void
-#define __WRITE_RETURN(x) return;
-#else
-#define __WRITE_RESULT size_t
-#define __WRITE_RETURN(x) return x;
-#endif
 
 #define HASH_LENGTH 20
 #define BLOCK_LENGTH 64
 
-union _buffer {
-  uint8_t b[BLOCK_LENGTH];
-  uint32_t w[BLOCK_LENGTH/4];
-};
+#ifndef SHA1_H
+#define SHA1_H
 
-union _state {
-  uint8_t b[HASH_LENGTH];
-  uint32_t w[HASH_LENGTH/4];
-};
-
-class Sha1Class : public Print
-{
-  public:
-    void init(void);
-    void initHmac(const uint8_t* secret, int secretLength);
-    uint8_t* result(void);
-    uint8_t* resultHmac(void);
-    virtual __WRITE_RESULT write(uint8_t);
-    using Print::write;
+class SHA1 {
   private:
-    void pad();
-    void addUncounted(uint8_t data);
-    void hashBlock();
-    uint32_t rol32(uint32_t number, uint8_t bits);
-    _buffer buffer;
+    union _buffer {
+      uint8_t b[BLOCK_LENGTH];
+      uint32_t w[BLOCK_LENGTH/4];
+    } buffer;
+    union _state {
+      uint8_t b[HASH_LENGTH];
+      uint32_t w[HASH_LENGTH/4];
+    } state;
+
     uint8_t bufferOffset;
-    _state state;
     uint32_t byteCount;
     uint8_t keyBuffer[BLOCK_LENGTH];
     uint8_t innerHash[HASH_LENGTH];
-    
+
+    uint32_t rol32(uint32_t number, uint8_t bits);
+    void hashBlock();
+    void addUncounted(uint8_t data);
+    void pad();
+
+  public:
+    void resetState();
+    void initHmac(const uint8_t* secret, uint8_t secretLength);
+    uint8_t* result();
+    uint8_t* resultHmac();
+    void write(uint8_t);
+    void writeArray(uint8_t *buffer, uint8_t size);
 };
-extern Sha1Class Sha1;
 
 #endif

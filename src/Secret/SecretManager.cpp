@@ -19,12 +19,20 @@ const char* StoredKey::cNameKey() {
 }
 
 void SecretManager::start() {
+  if (isStarted) {
+    return;
+  }
+
   preferences.begin(SECRET_NAMESPACE, false);
   secretCount = preferences.getUChar(SECRET_INDEX, 0);
   isStarted = true;
 }
 
 void SecretManager::end() {
+  if (!isStarted) {
+    return;
+  }
+
   preferences.end();
   isStarted = false;
   secretCount = 0;
@@ -50,7 +58,11 @@ Secret SecretManager::readRecord(uint8_t index) {
   StoredKey keyNames = StoredKey(String(index));
   uint16_t secretBitLen = preferences.getUShort(keyNames.cSizeKey());
   Secret secret = Secret(secretBitLen);
-  preferences.getBytes(keyNames.cSecretKey(), secret.get(), secret.byteLen());
+  size_t bytesRead = preferences.getBytes(keyNames.cSecretKey(), secret.get(), secret.byteLen());
+  if (bytesRead != secret.byteLen()) {
+    Serial.println("Failed to read secret");
+    return Secret(0);
+  }
   secret.setName(preferences.getString(keyNames.cNameKey()));
 
   return secret;
@@ -71,7 +83,7 @@ bool SecretManager::deleteRecord(uint8_t index) {
   StoredKey sourceKeyNames;
 
   size_t secretSize;
-  byte *secret;
+  uint8_t *secret;
   int curIdx = index;
 
   if (!isIndexValid(index)) {
@@ -83,7 +95,7 @@ bool SecretManager::deleteRecord(uint8_t index) {
     sourceKeyNames = StoredKey(String(curIdx + 1));
 
     secretSize = preferences.getBytesLength(sourceKeyNames.cSecretKey());
-    secret = (byte*) malloc(secretSize);
+    secret = (uint8_t*) malloc(secretSize);
     preferences.getBytes(sourceKeyNames.cSecretKey(), secret, secretSize);
     preferences.putBytes(targetKeyNames.cSecretKey(), secret, secretSize);
     free(secret);

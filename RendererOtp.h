@@ -10,12 +10,15 @@
 #include "src/TOTP/TOTP.h"
 #include "src/Time/TimeManager.h"
 
+#define TIMESTEP 30
+
 class OTPRenderer: public IInputHandler {
   private:
     TFT_eSPI *tft;
     ScreenManagerMutator *screenMutator;
     SecretManager secretManager;
-    Secret currentSecret;
+    Secret *currentSecret;
+
     int curSecretIdx;
     TOTP totpGenerator;
 
@@ -24,6 +27,10 @@ class OTPRenderer: public IInputHandler {
     void renderOTPInitial();
     void renderOTPValue();
     void reloadOtpConfig();
+
+    void setCurrentSecret(Secret *newSecret);
+    void clearCurrentSecret();
+    bool isCurrentSecretValid();
 
   public:
     OTPRenderer(TFT_eSPI *tftRef, ScreenManagerMutator *screenMutator);

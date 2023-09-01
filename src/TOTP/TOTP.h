@@ -1,32 +1,22 @@
-// OpenAuthentication Time-based One-time Password Algorithm (RFC 6238)
-// Arduino Library
-// https://github.com/lucadentella/TOTP-Arduino
+#pragma once
 
-#include "Arduino.h"
+#ifndef TOTP_H
+#define TOTP_H
 
-#ifndef _TOTP_H
-#define _TOTP_H
-
+#include <inttypes.h>
+#include "time.h"
 
 class TOTP {
-
-	public:
-	
-		TOTP(uint8_t* hmacKey, int keyLength);
-		TOTP(uint8_t* hmacKey, int keyLength, int timeStep);
-		char* getCode(long timeStamp);
-		char* getCodeFromSteps(long steps);
-	
-	private:
-
-		uint8_t* _hmacKey;
-		int _keyLength;
-		int _timeStep;
-		uint8_t _byteArray[8];
-		uint8_t* _hash;
-		int _offset;
-		long _truncatedHash;
+  private:
+    uint8_t* _hmacKey;
+    uint8_t _keyLength;
+    uint32_t _timeStep;
 		char _code[7];
+
+  public:
+    TOTP(uint8_t* hmacKey, uint8_t keyLength, uint32_t timeStep);
+    char* getCodeFromTimestamp(uint32_t timeStamp);
+    char* getCodeFromSteps(uint32_t steps);
 };
 
 #endif
