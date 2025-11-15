@@ -1,23 +1,5 @@
 #include "SecretManager.h"
 
-StoredKey::StoredKey(const String &index): sizeKey(SECRET_SIZE_PREFIX + index),
-                                           secretKey(SECRET_RECORD_PREFIX + index),
-                                           nameKey(SECRET_NAME_PREFIX + index) {}
-
-StoredKey::StoredKey(): sizeKey(String()), secretKey(String()), nameKey(String()) {}
-
-const char* StoredKey::cSizeKey() {
-  return sizeKey.c_str();
-}
-
-const char* StoredKey::cSecretKey() {
-  return secretKey.c_str();
-}
-
-const char* StoredKey::cNameKey() {
-  return nameKey.c_str();
-}
-
 void SecretManager::start() {
   if (isStarted) {
     return;
@@ -38,13 +20,9 @@ void SecretManager::end() {
   secretCount = 0;
 }
 
-bool SecretManager::isActive() {
-  return isStarted;
-}
+bool SecretManager::isActive() { return isStarted; }
 
-void SecretManager::clear() {
-  preferences.clear();
-}
+void SecretManager::clear() { preferences.clear(); }
 
 bool SecretManager::isIndexValid(uint8_t index) {
   return index >= 0 && index < secretCount;
@@ -58,7 +36,8 @@ Secret SecretManager::readRecord(uint8_t index) {
   StoredKey keyNames = StoredKey(String(index));
   uint16_t secretBitLen = preferences.getUShort(keyNames.cSizeKey());
   Secret secret = Secret(secretBitLen);
-  size_t bytesRead = preferences.getBytes(keyNames.cSecretKey(), secret.get(), secret.byteLen());
+  size_t bytesRead = preferences.getBytes(keyNames.cSecretKey(), secret.get(),
+                                          secret.byteLen());
   if (bytesRead != secret.byteLen()) {
     Serial.println("Failed to read secret");
     return Secret(0);
@@ -68,7 +47,7 @@ Secret SecretManager::readRecord(uint8_t index) {
   return secret;
 }
 
-void SecretManager::putRecord(Secret *secret) {
+void SecretManager::putRecord(Secret* secret) {
   StoredKey keyNames = StoredKey(String(secretCount));
 
   preferences.putUShort(keyNames.cSizeKey(), secret->bitLen());
@@ -83,7 +62,7 @@ bool SecretManager::deleteRecord(uint8_t index) {
   StoredKey sourceKeyNames;
 
   size_t secretSize;
-  uint8_t *secret;
+  uint8_t* secret;
   int curIdx = index;
 
   if (!isIndexValid(index)) {
@@ -95,7 +74,7 @@ bool SecretManager::deleteRecord(uint8_t index) {
     sourceKeyNames = StoredKey(String(curIdx + 1));
 
     secretSize = preferences.getBytesLength(sourceKeyNames.cSecretKey());
-    secret = (uint8_t*) malloc(secretSize);
+    secret = (uint8_t*)malloc(secretSize);
     preferences.getBytes(sourceKeyNames.cSecretKey(), secret, secretSize);
     preferences.putBytes(targetKeyNames.cSecretKey(), secret, secretSize);
     free(secret);
@@ -118,6 +97,4 @@ bool SecretManager::deleteRecord(uint8_t index) {
   return true;
 }
 
-int SecretManager::getSecretCount() {
-  return secretCount;
-}
+int SecretManager::getSecretCount() { return secretCount; }

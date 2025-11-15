@@ -1,18 +1,19 @@
 #include "RendererConfig.h"
 
-#include "Util.h"
-#include "src/Secret/Base32.h"
+#include "Util/Base32.h"
 
-ConfigRenderer::ConfigRenderer(TFT_eSPI *tftRef, ScreenManagerMutator *screenMutator):
-  tft(tftRef), screenMutator(screenMutator) {}
+ConfigRenderer::ConfigRenderer(M5Display* tftRef,
+                               ScreenManagerMutator* screenMutator)
+    : tft(tftRef), screenMutator(screenMutator) {}
 
 void ConfigRenderer::renderInit() {
   screenMutator->resetDrawConfig();
   tft->setTextDatum(TL_DATUM);
-  tft->drawString("Config Mode", 16, 32);
-  tft->drawString("Connect Serial Tool", 16, 52);
-  
-  screenMutator->drawButtonLabels("Option >", "Ok (Back) >");
+  tft->drawString("Config Mode", 8, 14);
+  tft->setTextColor(TFT_PINK);
+  tft->drawString("Connecting..", 8, 32);
+
+  screenMutator->drawOptionLabel("^ Back");
   memset(&buffer, 0, sizeof(buffer));
   serialState = CONFIG_STATE_COMMAND_PRE;
   command = 0;
@@ -41,18 +42,16 @@ void ConfigRenderer::renderLoop() {
 }
 
 void ConfigRenderer::handleTopButton() {
-}
-
-void ConfigRenderer::handleBottomButton() {
-}
-
-void ConfigRenderer::handleBottomButtonLong() {
   if (bufPtr != nullptr) {
     free(bufPtr);
   }
   secretManager.end();
   screenMutator->setState(MENU_STATE_MAIN);
 }
+
+void ConfigRenderer::handleBottomButton() {}
+
+void ConfigRenderer::handleBottomButtonLong() {}
 
 void ConfigRenderer::handleCommandRead() {
   if (Serial.available() == 0) {
@@ -94,21 +93,21 @@ void ConfigRenderer::handleCommandRead() {
 void ConfigRenderer::handleCommandInit() {
   screenMutator->resetDrawConfig();
   tft->setTextDatum(TL_DATUM);
-  tft->fillRect(0, 52, 240, 20, TFT_BLACK);
+  tft->fillRect(0, 32, 180, 50, TFT_BLACK);
   switch (command) {
     case COMMAND_WORD_DEBUG:
-      tft->drawString("Serial Debug Cmd", 16, 52);
+      tft->drawString("Debug Recv", 8, 32);
       break;
     case COMMAND_WORD_PUT:
     case COMMAND_WORD_DELETE:
     case COMMAND_WORD_SHOW:
-      tft->drawString("Waiting", 16, 52);
+      tft->drawString("Waiting", 8, 32);
       buffer[0] = 0;
       buffer[1] = 0;
       buffer[2] = 0;
       break;
     default:
-      tft->drawString("Unknown Command", 16, 52);
+      tft->drawString("Unknown Cmd", 8, 32);
       timestamp = millis();
       break;
   }
@@ -145,19 +144,20 @@ void ConfigRenderer::handleShow() {
 
   screenMutator->resetDrawConfig();
   tft->setTextDatum(TL_DATUM);
-  tft->fillRect(0, 52, 240, 20, TFT_BLACK);
+  tft->fillRect(0, 32, 180, 50, TFT_BLACK);
+  tft->setTextSize(1);
   uint8_t index = Serial.read();
   Secret sec = secretManager.readRecord(index);
   if (sec.isValid()) {
     byte* secretString;
     Base32::toBase32(sec.get(), sec.bitLen(), secretString);
-    tft->drawString("Secret:", 16, 52);
-    tft->drawString(String(index).c_str(), 100, 52);
-    tft->drawString(sec.getName().c_str(), 16, 72);
-    tft->drawString((char *) secretString, 16, 92);
+    tft->drawString("Secret:", 8, 32);
+    tft->drawString(String(index).c_str(), 70, 32);
+    tft->drawString(sec.getName().c_str(), 8, 44);
+    tft->drawString((char*)secretString, 8, 56);
     free(secretString);
   } else {
-    tft->drawString("Invalid Index", 16, 52);
+    tft->drawString("Invalid Index", 8, 32);
   }
 
   timestamp = millis();
@@ -188,7 +188,7 @@ void ConfigRenderer::handleCreate() {
   int baseIdx = buffer[2];
 
   for (int i = 0; i < bytesRead; i++) {
-    ((byte *) bufPtr)[baseIdx + i] = buf[i];
+    ((byte*)bufPtr)[baseIdx + i] = buf[i];
   }
   buffer[2] += bytesRead;
 
@@ -196,31 +196,32 @@ void ConfigRenderer::handleCreate() {
     return;
   }
 
-  byte *secretBytes;
-  char *nameBytes;
-  Base32::fromBase32((byte*) bufPtr, buffer[0], secretBytes);
+  byte* secretBytes;
+  char* nameBytes;
+  Base32::fromBase32((byte*)bufPtr, buffer[0], secretBytes);
 
   Secret secret(buffer[0] * 5);
   memcpy(secret.get(), secretBytes, secret.byteLen());
   free(secretBytes);
-  
-  nameBytes = (char *) malloc(buffer[1] + 1);
-  memcpy(nameBytes, ((byte*) bufPtr) + buffer[0], buffer[1]);
+
+  nameBytes = (char*)malloc(buffer[1] + 1);
+  memcpy(nameBytes, ((byte*)bufPtr) + buffer[0], buffer[1]);
   nameBytes[buffer[1]] = 0;
 
   secret.setName(String(nameBytes));
   secretManager.putRecord(&secret);
   free(nameBytes);
-  
-  tft->fillRect(0, 52, 240, 20, TFT_BLACK);
-  tft->drawString("Added New Secret:", 16, 52);
-  tft->drawString(String(secret.byteLen()).c_str(), 16, 72);
-  tft->drawString("bytes, Pos:", 40, 72);
-  tft->drawString(String(secretManager.getSecretCount() - 1).c_str(), 190, 72);
+
+  tft->fillRect(0, 32, 180, 50, TFT_BLACK);
+  tft->setTextSize(1);
+  tft->drawString("Added New Secret:", 8, 32);
+  tft->drawString(String(secret.byteLen()).c_str(), 8, 44);
+  tft->drawString("bytes, Pos:", 40, 44);
+  tft->drawString(String(secretManager.getSecretCount() - 1).c_str(), 140, 44);
   Base32::toBase32(secret.get(), secret.bitLen(), secretBytes);
-  tft->drawString(nameBytes, 16, 92);
+  tft->drawString(nameBytes, 8, 56);
   free(secretBytes);
-  
+
   free(bufPtr);
   bufPtr = nullptr;
 
@@ -229,25 +230,26 @@ void ConfigRenderer::handleCreate() {
 }
 
 void ConfigRenderer::handleDelete() {
-    // Waiting for index to show
-    if (Serial.available() == 0) {
-      return;
-    }
+  // Waiting for index to show
+  if (Serial.available() == 0) {
+    return;
+  }
 
-    secretManager.deleteRecord(Serial.read());
-    screenMutator->resetDrawConfig();
-    tft->setTextDatum(TL_DATUM);
-    tft->fillRect(0, 52, 240, 20, TFT_BLACK);
-    tft->drawString("Secret Deleted", 16, 52);
+  secretManager.deleteRecord(Serial.read());
+  screenMutator->resetDrawConfig();
+  tft->setTextDatum(TL_DATUM);
+  tft->fillRect(0, 32, 180, 50, TFT_BLACK);
+  tft->setTextSize(1);
+  tft->drawString("Secret Deleted", 8, 32);
 
-    timestamp = millis();
-    serialState = CONFIG_STATE_WAIT_CLEAR;
+  timestamp = millis();
+  serialState = CONFIG_STATE_WAIT_CLEAR;
 }
 
 void ConfigRenderer::resetScreen() {
   screenMutator->resetDrawConfig();
   tft->setTextDatum(TL_DATUM);
-  tft->fillRect(0, 52, 240, 60, TFT_BLACK);
-  tft->drawString("Waiting for Cmd", 16, 52);
+  tft->fillRect(0, 32, 180, 50, TFT_BLACK);
+  tft->setTextSize(1);
+  tft->drawString("Waiting for Cmd", 8, 32);
 }
-

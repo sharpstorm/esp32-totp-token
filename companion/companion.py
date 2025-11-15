@@ -76,7 +76,7 @@ class CompanionApp:
 
 
 print('TOTP Token Companion Tool')
-with serial.Serial('COM4', 115200, timeout=2) as ser:
+with serial.Serial('COM6', 115200, timeout=2) as ser:
   print('Connection Established')
 
   app = CompanionApp(ser)

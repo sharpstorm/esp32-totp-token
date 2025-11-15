@@ -1,56 +1,72 @@
 #include "TimeManager.h"
 
-TimeData::TimeData(): hasInited(false) {}
-TimeData::TimeData(tm timeDat): hasInited(true), time(timeDat) {}
-TimeData::TimeData(const TimeData &other): hasInited(other.hasInited), time(other.time) {}
-
-tm TimeData::toTime() {
-  return time;
-}
-
-bool TimeData::isValid() {
-  return hasInited;
-}
-
-long TimeData::unix() {
-  return (long) mktime(&time);
-}
-
 TimeManager* TimeManager::instance = nullptr;
-TimeManager::TimeManager(): isTimeSynced(false) {}
+TimeManager::TimeManager() {}
+
+static void setTimeZone(long offset, int daylight) {
+  char cst[17] = {0};
+  char cdt[17] = "DST";
+  char tz[33] = {0};
+
+  if (offset % 3600) {
+    sprintf(cst, "UTC%ld:%02u:%02u", offset / 3600, abs((offset % 3600) / 60),
+            abs(offset % 60));
+  } else {
+    sprintf(cst, "UTC%ld", offset / 3600);
+  }
+  if (daylight != 3600) {
+    long tz_dst = offset - daylight;
+    if (tz_dst % 3600) {
+      sprintf(cdt, "DST%ld:%02u:%02u", tz_dst / 3600, abs((tz_dst % 3600) / 60),
+              abs(tz_dst % 60));
+    } else {
+      sprintf(cdt, "DST%ld", tz_dst / 3600);
+    }
+  }
+  sprintf(tz, "%s%s", cst, cdt);
+  setenv("TZ", tz, 1);
+  tzset();
+}
 
 bool TimeManager::syncTime() {
   configTime(GMT_OFFSET_SECS, 0, NTP_SERVER);
   struct tm timeInfo;
-  if(!getLocalTime(&timeInfo)){
+  if (!getLocalTime(&timeInfo)) {
     return false;
   }
 
-  isTimeSynced = true;
+  RTC_DateTypeDef date;
+  date.Date = timeInfo.tm_mday;
+  date.Month = timeInfo.tm_mon + 1;
+  date.Year = timeInfo.tm_year + 1900;
+  date.WeekDay = timeInfo.tm_wday;
+
+  RTC_TimeTypeDef time;
+  time.Hours = timeInfo.tm_hour;
+  time.Minutes = timeInfo.tm_min;
+  time.Seconds = timeInfo.tm_sec;
+
+  M5.Rtc.SetTime(&time);
+  M5.Rtc.SetData(&date);
+
   return true;
 }
 
 TimeData TimeManager::getTime() {
-  if (!isTimeSynced) {
-    return TimeData();
-  }
+  RTC_TimeTypeDef time;
+  RTC_DateTypeDef date;
 
-  struct tm timeInfo;
-  if (!getLocalTime(&timeInfo)) {
-    return TimeData();
-  }
+  M5.Rtc.GetTime(&time);
+  M5.Rtc.GetData(&date);
 
-  return TimeData(timeInfo);
+  return TimeData(&date, &time);
 }
 
-TimeManager* TimeManager:: getInstance() {
+TimeManager* TimeManager::getInstance() {
+  setTimeZone(-GMT_OFFSET_SECS, 0);
   if (instance == nullptr) {
     instance = new TimeManager();
   }
 
   return instance;
-}
-
-bool TimeManager::hasSynced() {
-  return isTimeSynced;
 }

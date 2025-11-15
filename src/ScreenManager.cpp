@@ -1,12 +1,13 @@
 #include "ScreenManager.h"
 
-ScreenManager::ScreenManager(TFT_eSPI *tftRef): tft(tftRef),
-                                                mainMenuRenderer(tftRef, this),
-                                                syncMenuRenderer(tftRef, this),
-                                                otpRenderer(tftRef, this),
-                                                configRenderer(tftRef, this),
-                                                infoRenderer(tftRef, this),
-                                                activeHandler(&mainMenuRenderer) {}
+ScreenManager::ScreenManager(M5Display* tftRef)
+    : tft(tftRef),
+      mainMenuRenderer(tftRef, this),
+      syncMenuRenderer(tftRef, this),
+      otpRenderer(tftRef, this),
+      configRenderer(tftRef, this),
+      infoRenderer(tftRef, this),
+      activeHandler(&mainMenuRenderer) {}
 
 void ScreenManager::setState(int state) {
   screenDirtyState &= (~SCREEN_DIRTY_STATE_MASK);
@@ -28,11 +29,11 @@ void ScreenManager::setState(int state) {
     case MENU_STATE_INFO:
       activeHandler = &infoRenderer;
       break;
-     default:
+    default:
       activeHandler = &mainMenuRenderer;
       break;
   }
-  
+
   setGlobalDirty();
 }
 
@@ -40,13 +41,9 @@ int ScreenManager::getState() {
   return (screenDirtyState & SCREEN_DIRTY_STATE_MASK);
 }
 
-bool ScreenManager::isInState(int state) {
-  return getState() == state;
-}
+bool ScreenManager::isInState(int state) { return getState() == state; }
 
-void ScreenManager::setGlobalDirty() {
-  screenDirtyState |= SCREEN_DIRTY_ALL;
-}
+void ScreenManager::setGlobalDirty() { screenDirtyState |= SCREEN_DIRTY_ALL; }
 
 bool ScreenManager::isGlobalDirty() {
   return (screenDirtyState & SCREEN_DIRTY_ALL) > 0;
@@ -56,17 +53,15 @@ void ScreenManager::resetGlobalDirty() {
   screenDirtyState &= (~SCREEN_DIRTY_GLOBAL_MASK);
 }
 
-void ScreenManager::drawButtonLabels(const char *top, const char *bottom) {
+void ScreenManager::drawOptionLabel(const char* top) {
   uint16_t oldColor = tft->textcolor;
   uint8_t oldSize = tft->textsize;
-  
+
   tft->setTextColor(TFT_PINK);
   tft->setTextSize(1);
-  
+
   tft->setTextDatum(TR_DATUM);
   tft->drawString(top, tft->width(), 0);
-  tft->setTextDatum(BR_DATUM);
-  tft->drawString(bottom, tft->width(), tft->height());
 
   tft->setTextSize(oldSize);
   tft->setTextColor(oldColor);
