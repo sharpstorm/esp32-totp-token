@@ -1,4 +1,4 @@
-#include "AppHandlers.hpp"
+#include "AppHandlers.h"
 
 void AppHandlers::handleRoot(HTTPRequest* req, HTTPResponse* res) {
   res->setHeader("Content-Type", "text/html");

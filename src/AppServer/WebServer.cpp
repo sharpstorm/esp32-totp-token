@@ -1,8 +1,6 @@
 #include "WebServer.h"
 
-WebServer::WebServer()
-    : httpServer(HTTPServer()),
-      httpsServer(HTTPSServer(&SslCertProvider::cert)) {}
+WebServer::WebServer() : httpServer(), httpsServer(&SslCertProvider::cert) {}
 
 void WebServer::start() {
   httpServer.start();
@@ -27,4 +25,9 @@ void WebServer::registerNode(HTTPNode* node) {
 void WebServer::setDefaultNode(HTTPNode* node) {
   httpServer.setDefaultNode(node);
   httpsServer.setDefaultNode(node);
+}
+
+void WebServer::addMiddleware(HTTPSMiddlewareFunction* middleware) {
+  httpServer.addMiddleware(middleware);
+  httpsServer.addMiddleware(middleware);
 }

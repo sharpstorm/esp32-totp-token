@@ -25,9 +25,13 @@ void MainMenuRenderer::renderLoop() {
         tft->drawString("Sync Clock", 8, 24);
         break;
       case 2:
-        tft->drawString("Config Tool", 8, 24);
+        tft->drawString("Config Via", 8, 24);
+        tft->drawString("Web", 8, 48);
         break;
       case 3:
+        tft->drawString("Config Tool", 8, 24);
+        break;
+      case 4:
         tft->drawString("Token Info", 8, 24);
         break;
     }
@@ -37,7 +41,7 @@ void MainMenuRenderer::renderLoop() {
 }
 
 void MainMenuRenderer::handleTopButton() {
-  menuSelection = (menuSelection + 1) % 4;
+  menuSelection = (menuSelection + 1) % 5;
   isDirty = true;
 }
 
@@ -50,11 +54,15 @@ void MainMenuRenderer::handleBottomButton() {
       screenMutator->setState(MENU_STATE_SYNC);
       break;
     case 2:
-      screenMutator->setState(MENU_STATE_CONFIG);
+      screenMutator->setState(MENU_STATE_WIFI_CONFIG);
       break;
     case 3:
+      screenMutator->setState(MENU_STATE_CONFIG);
+      break;
+    case 4:
       screenMutator->setState(MENU_STATE_INFO);
       break;
+
     default:
       break;
   }

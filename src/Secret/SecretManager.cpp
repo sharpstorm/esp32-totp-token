@@ -7,6 +7,7 @@ void SecretManager::start() {
 
   preferences.begin(SECRET_NAMESPACE, false);
   secretCount = preferences.getUChar(SECRET_INDEX, 0);
+  preferences.end();
   isStarted = true;
 }
 
@@ -15,14 +16,17 @@ void SecretManager::end() {
     return;
   }
 
-  preferences.end();
   isStarted = false;
   secretCount = 0;
 }
 
 bool SecretManager::isActive() { return isStarted; }
 
-void SecretManager::clear() { preferences.clear(); }
+void SecretManager::clear() {
+  preferences.begin(SECRET_NAMESPACE, false);
+  preferences.clear();
+  preferences.end();
+}
 
 bool SecretManager::isIndexValid(uint8_t index) {
   return index >= 0 && index < secretCount;
@@ -34,6 +38,7 @@ Secret SecretManager::readRecord(uint8_t index) {
   }
 
   StoredKey keyNames = StoredKey(String(index));
+  preferences.begin(SECRET_NAMESPACE, false);
   uint16_t secretBitLen = preferences.getUShort(keyNames.cSizeKey());
   Secret secret = Secret(secretBitLen);
   size_t bytesRead = preferences.getBytes(keyNames.cSecretKey(), secret.get(),
@@ -43,6 +48,7 @@ Secret SecretManager::readRecord(uint8_t index) {
     return Secret(0);
   }
   secret.setName(preferences.getString(keyNames.cNameKey()));
+  preferences.end();
 
   return secret;
 }
@@ -50,11 +56,13 @@ Secret SecretManager::readRecord(uint8_t index) {
 void SecretManager::putRecord(Secret* secret) {
   StoredKey keyNames = StoredKey(String(secretCount));
 
+  preferences.begin(SECRET_NAMESPACE, false);
   preferences.putUShort(keyNames.cSizeKey(), secret->bitLen());
   preferences.putBytes(keyNames.cSecretKey(), secret->get(), secret->byteLen());
   preferences.putString(keyNames.cNameKey(), secret->getName());
   secretCount++;
   preferences.putUChar(SECRET_INDEX, secretCount);
+  preferences.end();
 }
 
 bool SecretManager::deleteRecord(uint8_t index) {
@@ -69,6 +77,7 @@ bool SecretManager::deleteRecord(uint8_t index) {
     return false;
   }
 
+  preferences.begin(SECRET_NAMESPACE, false);
   for (; curIdx < secretCount - 1; curIdx++) {
     targetKeyNames = StoredKey(String(curIdx));
     sourceKeyNames = StoredKey(String(curIdx + 1));
@@ -93,6 +102,7 @@ bool SecretManager::deleteRecord(uint8_t index) {
 
   secretCount--;
   preferences.putUChar(SECRET_INDEX, secretCount);
+  preferences.end();
 
   return true;
 }

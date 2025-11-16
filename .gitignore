@@ -4,5 +4,4 @@
 .vscode/launch.json
 .vscode/ipch
 
-**/Config.h
 **/SslCertStore.cpp

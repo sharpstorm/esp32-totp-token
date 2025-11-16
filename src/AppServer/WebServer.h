@@ -16,6 +16,7 @@ class WebServer {
   void loop();
   void registerNode(HTTPNode* node);
   void setDefaultNode(HTTPNode* node);
+  void addMiddleware(HTTPSMiddlewareFunction* middleware);
 
  private:
   HTTPSServer httpsServer;

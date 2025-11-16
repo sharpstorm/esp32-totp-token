@@ -11,6 +11,7 @@
 #include "RendererMainMenu.h"
 #include "RendererOtp.h"
 #include "RendererSyncMenu.h"
+#include "RendererWifiConfig.h"
 #include "ScreenManagerMutator.h"
 
 // Dirty Bit Layout - 8 bits
@@ -30,6 +31,7 @@ class ScreenManager : public ScreenManagerMutator {
   OTPRenderer otpRenderer;
   ConfigRenderer configRenderer;
   InfoRenderer infoRenderer;
+  WifiConfigRenderer wifiConfigRenderer;
 
   IInputHandler* activeHandler;
 

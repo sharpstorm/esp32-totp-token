@@ -1,4 +1,4 @@
-#include "AppHandlers.hpp"
+#include "AppHandlers.h"
 
 void AppHandlers::handle404(HTTPRequest* req, HTTPResponse* res) {
   req->discardRequestBody();

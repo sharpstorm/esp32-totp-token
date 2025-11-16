@@ -1,7 +1,6 @@
 #pragma once
 
 #include "WebServer.h"
-#include "handlers/AppHandlers.hpp"
 
 using namespace httpsserver;
 
@@ -12,9 +11,16 @@ class AppServer {
   void stop();
   void loop();
 
+  static void captiveRedirectMiddleware(httpsserver::HTTPRequest* req,
+                                        httpsserver::HTTPResponse* res,
+                                        OnReceiveCb next);
+
  private:
   WebServer webServer;
 
-  ResourceNode nodeRoot;
-  ResourceNode node404;
+  ResourceNode routeRoot;
+  ResourceNode route404;
+  ResourceNode wifiApiScan;
+  ResourceNode wifiApiSaveConfig;
+  ResourceNode wifiApiGetConfig;
 };

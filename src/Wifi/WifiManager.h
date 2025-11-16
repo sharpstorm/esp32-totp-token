@@ -8,16 +8,21 @@ class WifiManager {
  public:
   WifiManager();
 
-  String getConfiguredSsid();
-
+  // As station
   bool connectToWifi();
   void disconnectWifi();
+  String getConfiguredSsid();
 
+  // As AP
   void startWifiHotspot();
   void stopWifiHotspot();
+  String getConfiguredHotspotSsid();
+  String getConfiguredHotspotPassword();
+  IPAddress getHotspotGatewayIp();
 
  private:
   char hotspotName[14];
+  char hotspotPassword[16];
 };
 
 extern WifiManager wifiManager;
