@@ -19,6 +19,10 @@ class AppServer {
   WebServer webServer;
 
   ResourceNode routeRoot;
+  ResourceNode routeIndexJs;
+  ResourceNode routeScannerJs;
+  ResourceNode routeIndexCss;
+
   ResourceNode route404;
   ResourceNode wifiApiScan;
   ResourceNode wifiApiSaveConfig;

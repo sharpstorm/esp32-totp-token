@@ -7,7 +7,10 @@
 
 WifiConfigRenderer::WifiConfigRenderer(M5Display* tftRef,
                                        ScreenManagerMutator* screenMutator)
-    : tft(tftRef), screenMutator(screenMutator), appServer() {}
+    : tft(tftRef),
+      screenMutator(screenMutator),
+      appServer(),
+      appServerState({&appServer, false}) {}
 
 void WifiConfigRenderer::renderInit() {
   tft->setTextDatum(TL_DATUM);
@@ -16,8 +19,9 @@ void WifiConfigRenderer::renderInit() {
 
   tft->drawString("> Starting WiFi Hotspot", 8, S1_LINE_1);
   wifiManager.startWifiHotspot();
-  appServer.start();
-  dnsServer.start();
+  appServerState.isRunning = true;
+  xTaskCreatePinnedToCore(WifiConfigRenderer::appServerWorker, "https443", 6144,
+                          &appServerState, 1, NULL, ARDUINO_RUNNING_CORE);
   tft->fillRect(0, S1_LINE_1, 180, S1_LINE_HEIGHT, TFT_BLACK);
 
   screenMutator->drawOptionLabel("^ Back");
@@ -38,14 +42,10 @@ void WifiConfigRenderer::renderInit() {
   tft->setTextColor(TFT_GREEN);
 }
 
-void WifiConfigRenderer::renderLoop() {
-  appServer.loop();
-  dnsServer.loop();
-}
+void WifiConfigRenderer::renderLoop() {}
 
 void WifiConfigRenderer::handleTopButton() {
-  dnsServer.stop();
-  appServer.stop();
+  appServerState.isRunning = false;
   wifiManager.stopWifiHotspot();
   screenMutator->setState(MENU_STATE_MAIN);
 }
@@ -53,3 +53,15 @@ void WifiConfigRenderer::handleTopButton() {
 void WifiConfigRenderer::handleBottomButton() {}
 
 void WifiConfigRenderer::handleBottomButtonLong() {}
+
+void WifiConfigRenderer::appServerWorker(void* pvParameters) {
+  AppServerWorkerDto* dtoPtr = (AppServerWorkerDto*)(pvParameters);
+
+  dtoPtr->appServer->start();
+  while (dtoPtr->isRunning) {
+    dtoPtr->appServer->loop();
+  }
+  dtoPtr->appServer->stop();
+
+  vTaskDelete(NULL);
+}

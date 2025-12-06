@@ -7,6 +7,10 @@
 AppServer::AppServer()
     : webServer(),
       routeRoot("/", "GET", &AppHandlers::handleRoot),
+      routeIndexCss("/index.css", "GET", &AppHandlers::handleCss),
+      routeIndexJs("/index.js", "GET", &AppHandlers::handleJs),
+      routeScannerJs("/qr-scanner-worker.min.js", "GET",
+                     &AppHandlers::handleScannerJs),
       route404("", "GET", &AppHandlers::handle404),
 
       wifiApiScan("/wifi/scan", "POST", &WifiConfigApi::scanWifiNetworks),
@@ -16,6 +20,10 @@ AppServer::AppServer()
   webServer.addMiddleware(&AppServer::captiveRedirectMiddleware);
   // Register routes
   webServer.registerNode(&routeRoot);
+  webServer.registerNode(&routeIndexCss);
+  webServer.registerNode(&routeIndexJs);
+  webServer.registerNode(&routeScannerJs);
+
   webServer.registerNode(&route404);
   webServer.registerNode(&wifiApiScan);
   webServer.registerNode(&wifiApiSaveConfig);

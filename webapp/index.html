@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./app.css">
+  <title>Google Authenticator Decoder</title>
+</head>
+
+<body>
+  <div class="container">
+    <div id="video-container" style="display: none;">
+      <video id="preview-video" autoplay playsinline></video>
+      <div class="scan-overlay">
+        <div class="scan-line"></div>
+      </div>
+    </div>
+
+    <button id="start-btn">Start Camera</button>
+    <button id="stop-btn" style="display: none;">Stop Camera</button>
+
+    <div class="status" id="status">Click "Start Camera" to begin scanning</div>
+
+    <div id="result">
+      <h2>QR Code Detected!</h2>
+      <div id="result-url">gotp://asdfasdfasdf</div>
+      <div id="result-items-container">
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>

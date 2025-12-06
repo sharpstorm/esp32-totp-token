@@ -6,7 +6,6 @@
 #include <M5StickC.h>
 
 #include "AppServer/AppServer.h"
-#include "DnsServer/CaptiveDnsServer.h"
 #include "IInputHandler.h"
 #include "ScreenManagerMutator.h"
 
@@ -19,14 +18,20 @@
 
 #define S1_LINE_HEIGHT 12
 
+struct AppServerWorkerDto {
+  AppServer* appServer;
+  bool isRunning;
+};
+
 class WifiConfigRenderer : public IInputHandler {
  private:
   M5Display* tft;
   ScreenManagerMutator* screenMutator;
   AppServer appServer;
-  CaptiveDnsServer dnsServer;
+  AppServerWorkerDto appServerState;
 
   void syncTime();
+  static void appServerWorker(void* pvParameters);
 
  public:
   WifiConfigRenderer(M5Display* tftRef, ScreenManagerMutator* screenMutator);

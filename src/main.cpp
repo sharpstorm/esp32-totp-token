@@ -26,7 +26,6 @@ void setup() {
   btStop();
   SPIFFS.begin(true);
   M5.begin();
-
   M5.Lcd.setRotation(1);
   screenManager.setState(MENU_STATE_OTP);
 }
