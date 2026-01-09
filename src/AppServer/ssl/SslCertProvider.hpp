@@ -1,8 +1,7 @@
 #pragma once
 
-#include <SSLCert.hpp>
-
 #include "SslCertStore.h"
+#include "esp32_https_server/SSLCert.hpp"
 
 using namespace httpsserver;
 

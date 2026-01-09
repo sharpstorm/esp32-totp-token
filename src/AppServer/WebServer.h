@@ -1,9 +1,8 @@
 #pragma once
 
-#include <HTTPSServer.hpp>
-#include <HTTPServer.hpp>
-
 #include "Arduino.h"
+#include "esp32_https_server/HTTPSServer.hpp"
+#include "esp32_https_server/HTTPServer.hpp"
 #include "ssl/SslCertProvider.hpp"
 
 using namespace httpsserver;

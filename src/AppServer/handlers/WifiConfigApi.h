@@ -1,7 +1,7 @@
 #pragma once
 
-#include <HTTPRequest.hpp>
-#include <HTTPResponse.hpp>
+#include "esp32_https_server/HTTPRequest.hpp"
+#include "esp32_https_server/HTTPResponse.hpp"
 
 using namespace httpsserver;
 
