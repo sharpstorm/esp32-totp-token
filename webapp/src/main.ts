@@ -11,6 +11,7 @@ import {
 } from './bindings'
 import { decodeOtpUrl } from './payload-parser'
 import { makeNode } from './dom-utils'
+import { bindContentTabInteraction } from './tabs'
 
 let qrScanner: QrScanner | null
 let isScanning = false
@@ -98,6 +99,7 @@ const addResultRow = ({
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  bindContentTabInteraction()
   startBtn.addEventListener('click', startScanning)
   stopBtn.addEventListener('click', stopScanning)
   qrScanner = new QrScanner(previewVideo, handleQrScanResult, {})

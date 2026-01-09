@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+h1 {
+  color: white;
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 2em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 1200px;
+  width: 100%;
+}
+
+#tab-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.tab-active:hover {
+  transform: none;
+  box-shadow: none;
+  cursor: auto;
+}
+
+.tab {
+  background: linear-gradient(135deg, #667eea5d 0%, #764ba25d 100%);
+  color: #764ba2;
+}
+
+.content-pane {
+  display: none;
+}
+
+.content-pane-active {
+  display: block;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+hr {
+  color: #bcc2df;
+  background: #bcc2df;
+  height: 1px;
+  font-size: 0;
+  border: 0;
+}

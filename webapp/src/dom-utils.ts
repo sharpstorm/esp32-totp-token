@@ -30,3 +30,9 @@ export const makeNode = (
 
   return element
 }
+
+export const removeClassFromAllElements = (className: string) => {
+  for (const ele of document.getElementsByClassName(className)) {
+    ele.classList.remove(className)
+  }
+}

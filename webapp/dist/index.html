@@ -3,45 +3,46 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Google Authenticator Decoder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOTP Token Configuration</title>
   <script type="module" crossorigin src="./index.js"></script>
   <link rel="stylesheet" crossorigin href="./index.css">
 </head>
 
 <body>
   <div class="container">
-    <div id="video-container" style="display: none;">
-      <video id="preview-video" autoplay playsinline></video>
-      <div class="scan-overlay">
-        <div class="scan-line"></div>
+    <div id="tab-container">
+      <button id="tab-wifi-config" class="tab tab-active">WiFi Config</button>
+      <button id="tab-secret-config" class="tab">Secret Config</button>
+    </div>
+    <hr style="margin-bottom: 1rem;" />
+    <div id="content-container">
+      <div id="wifi-config-content-container" class="content-pane content-pane-active">
+        Wifi Config
+      </div>
+      <div id="secret-config-content-container" class="content-pane">
+        <div id="video-container" style="display: none;">
+          <video id="preview-video" autoplay playsinline></video>
+          <div class="scan-overlay">
+            <div class="scan-line"></div>
+          </div>
+        </div>
+
+        <button id="start-btn">Start Camera</button>
+        <button id="stop-btn" style="display: none;">Stop Camera</button>
+
+        <div class="status" id="status">Click "Start Camera" to begin scanning</div>
+
+        <div id="result">
+          <h2>QR Code Detected!</h2>
+          <div id="result-url"></div>
+          <div id="result-items-container">
+          </div>
+        </div>
       </div>
     </div>
-
-    <button id="start-btn">Start Camera</button>
-    <button id="stop-btn" style="display: none;">Stop Camera</button>
-
-    <div class="status" id="status">Click "Start Camera" to begin scanning</div>
-
-    <div id="result">
-      <h2>QR Code Detected!</h2>
-      <div id="result-url">gotp://asdfasdfasdf</div>
-      <div id="result-items-container">
-        <div class="result-row">
-          <div class="result-metadata">
-            <strong> (Google)</strong>
-          </div>
-          <div class="result-secret">Secretbase32asdfsadfasdfasdf</div>
-        </div>
-        <div class="result-row">
-          <div class="result-metadata">
-            <strong> (Google)</strong>
-          </div>
-          <div class="result-secret">Secretbase32asdfsadfasdfasdf</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  </div>
+
 </body>
 
 </html>

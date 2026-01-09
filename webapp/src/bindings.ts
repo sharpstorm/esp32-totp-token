@@ -23,3 +23,14 @@ export const resultItemsContainer = requireElement<HTMLDivElement>(
 )
 export const status = requireElement<HTMLDivElement>('status')
 export const videoContainer = requireElement<HTMLDivElement>('video-container')
+
+export const tabWifiConfig =
+  requireElement<HTMLButtonElement>('tab-wifi-config')
+export const tabSecretConfig =
+  requireElement<HTMLButtonElement>('tab-secret-config')
+export const contentPaneWifiConfig = requireElement<HTMLDivElement>(
+  'wifi-config-content-container',
+)
+export const contentPaneSecretConfig = requireElement<HTMLDivElement>(
+  'secret-config-content-container',
+)
