@@ -34,3 +34,15 @@ export const contentPaneWifiConfig = requireElement<HTMLDivElement>(
 export const contentPaneSecretConfig = requireElement<HTMLDivElement>(
   'secret-config-content-container',
 )
+
+export const secretConfigInputName =
+  requireElement<HTMLInputElement>('input-secret-name')
+export const secretConfigInputSecret = requireElement<HTMLInputElement>(
+  'input-secret-base32',
+)
+export const secretConfigInputAddBtn = requireElement<HTMLButtonElement>(
+  'btn-secret-input-add',
+)
+export const secretConfigSuccessCallout = requireElement<HTMLDivElement>(
+  'input-secret-success',
+)

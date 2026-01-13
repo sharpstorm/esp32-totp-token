@@ -20,23 +20,41 @@
       <div id="wifi-config-content-container" class="content-pane content-pane-active">
         Wifi Config
       </div>
-      <div id="secret-config-content-container" class="content-pane">
-        <div id="video-container" style="display: none;">
-          <video id="preview-video" autoplay playsinline></video>
-          <div class="scan-overlay">
-            <div class="scan-line"></div>
+      <div id="secret-config-content-container" class="content-pane input-mode">
+        <div id="secret-config-input">
+          <div id="secret-config-input-content">
+            <input id="input-secret-name" type="text" placeholder="Name"></input>
+            <input id="input-secret-base32" type="text" placeholder="Secret"></input>
+            <button id="btn-secret-input-add">Add</button>
+          </div>
+          <div class="success-callout" id="input-secret-success">
+            <div class="success-icon">✓</div>
+            <div class="success-content">
+              <div class="success-title">Secret Added</div>
+              <div class="success-message">
+                The TOTP token has been saved successfully.
+              </div>
+            </div>
           </div>
         </div>
+        <div id="secret-config-scan">
+          <div id="video-container" style="display: none;">
+            <video id="preview-video" autoplay playsinline></video>
+            <div class="scan-overlay">
+              <div class="scan-line"></div>
+            </div>
+          </div>
 
-        <button id="start-btn">Start Camera</button>
-        <button id="stop-btn" style="display: none;">Stop Camera</button>
+          <button id="start-btn">Start Camera</button>
+          <button id="stop-btn" style="display: none;">Stop Camera</button>
 
-        <div class="status" id="status">Click "Start Camera" to begin scanning</div>
+          <div class="status" id="status">Click "Start Camera" to begin scanning</div>
 
-        <div id="result">
-          <h2>QR Code Detected!</h2>
-          <div id="result-url"></div>
-          <div id="result-items-container">
+          <div id="result">
+            <h2>QR Code Detected!</h2>
+            <div id="result-url"></div>
+            <div id="result-items-container">
+            </div>
           </div>
         </div>
       </div>

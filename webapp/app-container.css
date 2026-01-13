@@ -97,3 +97,44 @@ hr {
   font-size: 0;
   border: 0;
 }
+
+input {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #2d2a4a;
+
+  background: #ffffff;
+  border: 1px solid #d6d9f0;
+  border-radius: 0.6rem;
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+input::placeholder {
+  color: #9aa0c9;
+}
+
+/* Focus state */
+input:focus {
+  outline: none;
+  border-color: #667eea;
+  background-color: #fdfdff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+}
+
+input[type='password'] {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.04em;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.05),
+    rgba(118, 75, 162, 0.05)
+  );
+}
+
+input:hover {
+  border-color: #b8bff0;
+}
