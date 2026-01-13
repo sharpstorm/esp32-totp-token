@@ -108,3 +108,5 @@ bool SecretManager::deleteRecord(uint8_t index) {
 }
 
 int SecretManager::getSecretCount() { return secretCount; }
+
+SecretManager secretManager;

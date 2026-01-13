@@ -31,4 +31,6 @@ class SecretManager {
   bool isIndexValid(uint8_t index);
 };
 
+extern SecretManager secretManager;
+
 #endif

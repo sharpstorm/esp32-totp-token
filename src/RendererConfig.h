@@ -27,7 +27,6 @@ class ConfigRenderer : public IInputHandler {
  private:
   M5Display* tft;
   ScreenManagerMutator* screenMutator;
-  SecretManager secretManager;
 
   byte buffer[4];
   void* bufPtr;

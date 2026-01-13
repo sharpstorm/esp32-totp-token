@@ -27,4 +27,8 @@ class AppServer {
   ResourceNode wifiApiScan;
   ResourceNode wifiApiSaveConfig;
   ResourceNode wifiApiGetConfig;
+
+  ResourceNode secretsApiGetSecrets;
+  ResourceNode secretsApiSaveSecret;
+  ResourceNode secretsApiDeleteSecret;
 };

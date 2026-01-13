@@ -18,7 +18,6 @@ class InfoRenderer : public IInputHandler {
  private:
   M5Display* tft;
   ScreenManagerMutator* screenMutator;
-  SecretManager secretManager;
   int vref = 1100;
   uint64_t timeStamp = 0;
   uint8_t page = 0;

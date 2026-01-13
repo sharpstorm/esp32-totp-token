@@ -17,7 +17,6 @@ class OTPRenderer : public IInputHandler {
  private:
   M5Display* tft;
   ScreenManagerMutator* screenMutator;
-  SecretManager secretManager;
   Secret* currentSecret;
 
   int curSecretIdx;

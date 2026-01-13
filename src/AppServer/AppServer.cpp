@@ -2,6 +2,7 @@
 
 #include "handlers/AppHandlers.h"
 #include "handlers/HttpUtil.h"
+#include "handlers/SecretsConfigApi.h"
 #include "handlers/WifiConfigApi.h"
 
 AppServer::AppServer()
@@ -16,7 +17,12 @@ AppServer::AppServer()
       wifiApiScan("/wifi/scan", "POST", &WifiConfigApi::scanWifiNetworks),
       wifiApiSaveConfig("/wifi/config", "PUT", &WifiConfigApi::saveWifiNetwork),
       wifiApiGetConfig("/wifi/config", "GET",
-                       &WifiConfigApi::getSavedWifiNetwork) {
+                       &WifiConfigApi::getSavedWifiNetwork),
+
+      secretsApiGetSecrets("/secrets", "GET", &SecretsConfigApi::getSecrets),
+      secretsApiSaveSecret("/secrets", "POST", &SecretsConfigApi::saveSecret),
+      secretsApiDeleteSecret("/secrets", "DELETE",
+                             &SecretsConfigApi::deleteSecret) {
   webServer.addMiddleware(&AppServer::captiveRedirectMiddleware);
   // Register routes
   webServer.registerNode(&routeRoot);
@@ -28,6 +34,10 @@ AppServer::AppServer()
   webServer.registerNode(&wifiApiScan);
   webServer.registerNode(&wifiApiSaveConfig);
   webServer.registerNode(&wifiApiGetConfig);
+
+  webServer.registerNode(&secretsApiGetSecrets);
+  webServer.registerNode(&secretsApiSaveSecret);
+  webServer.registerNode(&secretsApiDeleteSecret);
 }
 
 void AppServer::start() { webServer.start(); }
