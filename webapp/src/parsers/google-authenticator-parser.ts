@@ -1,8 +1,8 @@
-import { encodeBase32 } from './base32'
-import { ReadableStream } from './readable-stream'
-import { OtpParameters } from './types'
+import { encodeBase32 } from '../base32'
+import { ReadableStream } from '../readable-stream'
+import { OtpParameters } from '../types'
 
-export const decodeOtpUrl = (url: string) => {
+export const decodeGoogleAuthenticatorUrl = (url: string) => {
   const base64Data = getBase64Data(url)
   if (!base64Data) {
     throw new Error('Not a valid Google Authenticator URL')

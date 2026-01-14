@@ -11,7 +11,7 @@
 
 <body>
   <div class="container">
-    <div id="tab-container">
+    <div id="tab-container" class="tab-container">
       <button id="tab-wifi-config" class="tab tab-active">WiFi Config</button>
       <button id="tab-secret-config" class="tab">Secret Config</button>
     </div>
@@ -21,6 +21,11 @@
         Wifi Config
       </div>
       <div id="secret-config-content-container" class="content-pane input-mode">
+        <div id="secret-config-mode" class="tab-container">
+          <button id="secret-config-manual-btn" class="tab tab-active">Manual Input</button>
+          <button id="secret-config-scan-btn" class="tab">Scan</button>
+        </div>
+
         <div id="secret-config-input">
           <div id="secret-config-input-content">
             <input id="input-secret-name" type="text" placeholder="Name"></input>
@@ -38,22 +43,22 @@
           </div>
         </div>
         <div id="secret-config-scan">
-          <div id="video-container" style="display: none;">
-            <video id="preview-video" autoplay playsinline></video>
+          <div id="secret-config-scan-video-container" style="display: none;">
+            <video id="secret-config-scan-preview-video" autoplay playsinline></video>
             <div class="scan-overlay">
               <div class="scan-line"></div>
             </div>
           </div>
 
-          <button id="start-btn">Start Camera</button>
-          <button id="stop-btn" style="display: none;">Stop Camera</button>
+          <button id="secret-config-scan-start-btn">Start Camera</button>
+          <button id="secret-config-scan-stop-btn" style="display: none;">Stop Camera</button>
 
-          <div class="status" id="status">Click "Start Camera" to begin scanning</div>
+          <div class="status" id="secret-config-scan-status">Click "Start Camera" to begin scanning</div>
 
-          <div id="result">
+          <div id="secret-config-scan-result">
             <h2>QR Code Detected!</h2>
-            <div id="result-url"></div>
-            <div id="result-items-container">
+            <div id="secret-config-scan-result-url"></div>
+            <div id="secret-config-scan-result-items-container">
             </div>
           </div>
         </div>

@@ -13,16 +13,30 @@ export const require = <T>(obj: T | null | undefined) => {
   return obj
 }
 
-export const previewVideo = requireElement<HTMLVideoElement>('preview-video')
-export const startBtn = requireElement<HTMLButtonElement>('start-btn')
-export const stopBtn = requireElement<HTMLButtonElement>('stop-btn')
-export const resultBox = requireElement<HTMLDivElement>('result')
-export const resultUrl = requireElement<HTMLDivElement>('result-url')
-export const resultItemsContainer = requireElement<HTMLDivElement>(
-  'result-items-container',
+export const previewVideo = requireElement<HTMLVideoElement>(
+  'secret-config-scan-preview-video',
 )
-export const status = requireElement<HTMLDivElement>('status')
-export const videoContainer = requireElement<HTMLDivElement>('video-container')
+export const startBtn = requireElement<HTMLButtonElement>(
+  'secret-config-scan-start-btn',
+)
+export const stopBtn = requireElement<HTMLButtonElement>(
+  'secret-config-scan-stop-btn',
+)
+export const resultBox = requireElement<HTMLDivElement>(
+  'secret-config-scan-result',
+)
+export const resultUrl = requireElement<HTMLDivElement>(
+  'secret-config-scan-result-url',
+)
+export const resultItemsContainer = requireElement<HTMLDivElement>(
+  'secret-config-scan-result-items-container',
+)
+export const status = requireElement<HTMLDivElement>(
+  'secret-config-scan-status',
+)
+export const videoContainer = requireElement<HTMLDivElement>(
+  'secret-config-scan-video-container',
+)
 
 export const tabWifiConfig =
   requireElement<HTMLButtonElement>('tab-wifi-config')
@@ -45,4 +59,11 @@ export const secretConfigInputAddBtn = requireElement<HTMLButtonElement>(
 )
 export const secretConfigSuccessCallout = requireElement<HTMLDivElement>(
   'input-secret-success',
+)
+
+export const secretConfigManualButton = requireElement<HTMLButtonElement>(
+  'secret-config-manual-btn',
+)
+export const secretConfigScanButton = requireElement<HTMLButtonElement>(
+  'secret-config-scan-btn',
 )

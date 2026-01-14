@@ -33,6 +33,10 @@ h1 {
 }
 
 #tab-container {
+  padding-bottom: 1rem;
+}
+
+.tab-container {
   display: flex;
   gap: 0.5rem;
 }
@@ -72,7 +76,6 @@ button {
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  margin-bottom: 20px;
 }
 
 button:hover {
