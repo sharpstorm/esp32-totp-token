@@ -1,4 +1,4 @@
-import { encodeBase32 } from '../base32'
+import { encodeBase32 } from './base32'
 import { ReadableStream } from '../readable-stream'
 import { OtpParameters } from '../types'
 
