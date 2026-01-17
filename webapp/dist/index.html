@@ -18,7 +18,33 @@
     <hr style="margin-bottom: 1rem;" />
     <div id="content-container">
       <div id="wifi-config-content-container" class="content-pane content-pane-active">
-        Wifi Config
+        <div id="wifi-config-current">
+          <div class="wifi-current-label">Current WiFi Network</div>
+          <div id="wifi-current-ssid" class="wifi-current-ssid">Loading...</div>
+        </div>
+
+        <button id="btn-wifi-scan">Scan for Networks</button>
+
+        <div id="wifi-networks-list" class="wifi-networks-list"></div>
+
+        <div id="wifi-passphrase-input" class="wifi-passphrase-container">
+          <div class="wifi-selected-network">
+            <span class="wifi-network-label">Selected Network:</span>
+            <span id="wifi-selected-ssid" class="wifi-selected-ssid"></span>
+          </div>
+          <input id="input-wifi-passphrase" type="password" placeholder="Enter WiFi Passphrase" />
+          <button id="btn-wifi-save">Save WiFi Configuration</button>
+        </div>
+
+        <div class="success-callout" id="wifi-save-success">
+          <div class="success-icon">✓</div>
+          <div class="success-content">
+            <div class="success-title">WiFi Configured</div>
+            <div class="success-message">
+              The WiFi network has been saved successfully.
+            </div>
+          </div>
+        </div>
       </div>
       <div id="secret-config-content-container" class="content-pane input-mode">
         <div id="secret-config-mode" class="tab-container">

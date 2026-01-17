@@ -12,6 +12,25 @@ export type SecretsPreviewDto = {
   count: number
 }
 
+export type WifiNetwork = {
+  ssid: string
+  rssi: number
+  security: string
+}
+
+export type WifiNetworksDto = {
+  networks: WifiNetwork[]
+}
+
+export type CurrentWifiDto = {
+  ssid: string | null
+}
+
+export type SaveWifiReq = {
+  ssid: string
+  passphrase: string
+}
+
 const saveSecret = async ({ name, secret }: SaveSecretOpts) => {
   const resp = await fetch('/secrets', {
     method: 'POST',
@@ -37,4 +56,46 @@ const getSecrets = async () => {
   return body.secrets
 }
 
-export const Api = { saveSecret, getSecrets }
+const getCurrentWifi = async (): Promise<string | null> => {
+  const resp = await fetch('/wifi/config')
+
+  if (resp.status !== 200) {
+    return null
+  }
+
+  const body: CurrentWifiDto = await resp.json()
+  return body.ssid
+}
+
+const scanWifiNetworks = async (): Promise<WifiNetwork[]> => {
+  const resp = await fetch('/wifi/scan', {
+    method: 'POST',
+  })
+
+  if (resp.status !== 200) {
+    return []
+  }
+
+  const body: WifiNetworksDto = await resp.json()
+  return body.networks
+}
+
+const saveWifi = async ({ ssid, passphrase }: SaveWifiReq) => {
+  const resp = await fetch('/wifi/config', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ ssid, passphrase }),
+  })
+
+  return resp.status === 200
+}
+
+export const Api = {
+  saveSecret,
+  getSecrets,
+  getCurrentWifi,
+  scanWifiNetworks,
+  saveWifi,
+}

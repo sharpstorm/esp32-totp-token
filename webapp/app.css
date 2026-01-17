@@ -1,3 +1,130 @@
+/* WiFi Configuration Styles */
+#wifi-config-current {
+  padding: 1rem;
+  background: #f7f8ff;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e5f5;
+  margin-bottom: 1rem;
+}
+
+.wifi-current-label {
+  font-size: 0.85rem;
+  color: #5c5a87;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.wifi-current-ssid {
+  font-size: 1.1rem;
+  color: #2d2a4a;
+  font-weight: 600;
+}
+
+.wifi-current-ssid.wifi-not-configured {
+  color: #9aa0c9;
+  font-style: italic;
+}
+
+#btn-wifi-scan {
+  margin-bottom: 1rem;
+}
+
+.wifi-networks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.wifi-network-item {
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #d6d9f0;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wifi-network-item:hover {
+  border-color: #667eea;
+  background: #f7f8ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
+.wifi-network-item-selected {
+  border-color: #667eea;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.08),
+    rgba(118, 75, 162, 0.08)
+  );
+  border-width: 2px;
+}
+
+.wifi-network-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.wifi-network-ssid {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d2a4a;
+}
+
+.wifi-network-details {
+  font-size: 0.85rem;
+  color: #5c5a87;
+}
+
+.wifi-passphrase-container {
+  display: none;
+  padding: 1rem;
+  background: #f7f8ff;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e5f5;
+  margin-bottom: 1rem;
+}
+
+.wifi-selected-network {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.12),
+    rgba(118, 75, 162, 0.12)
+  );
+  border-radius: 0.5rem;
+}
+
+.wifi-network-label {
+  font-size: 0.85rem;
+  color: #5c5a87;
+  margin-right: 0.5rem;
+}
+
+.wifi-selected-ssid {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2d2a4a;
+}
+
+#input-wifi-passphrase {
+  margin-bottom: 1rem;
+}
+
+.wifi-error,
+.wifi-no-networks {
+  padding: 1rem;
+  text-align: center;
+  color: #5c5a87;
+  background: #f7f8ff;
+  border-radius: 0.6rem;
+  border: 1px solid #e2e5f5;
+}
+
 #secret-config-scan-video-container {
   position: relative;
   width: 100%;

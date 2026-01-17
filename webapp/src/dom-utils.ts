@@ -31,6 +31,12 @@ export const makeNode = (
   return element
 }
 
+export const removeAllChildren = (node: HTMLElement) => {
+  while (node.lastChild) {
+    node.removeChild(node.lastChild)
+  }
+}
+
 export const removeClassFromAllElements = (className: string) => {
   for (const ele of document.getElementsByClassName(className)) {
     ele.classList.remove(className)

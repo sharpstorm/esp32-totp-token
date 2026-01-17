@@ -67,3 +67,20 @@ export const secretConfigManualButton = requireElement<HTMLButtonElement>(
 export const secretConfigScanButton = requireElement<HTMLButtonElement>(
   'secret-config-scan-btn',
 )
+
+export const currentSsidDiv =
+  requireElement<HTMLDivElement>('wifi-current-ssid')
+export const scanBtn = requireElement<HTMLButtonElement>('btn-wifi-scan')
+export const networksListContainer =
+  requireElement<HTMLDivElement>('wifi-networks-list')!
+export const passphraseContainer = requireElement<HTMLDivElement>(
+  'wifi-passphrase-input',
+)!
+export const passphraseInput = requireElement<HTMLInputElement>(
+  'input-wifi-passphrase',
+) as HTMLInputElement
+export const selectedSsidDiv =
+  requireElement<HTMLSpanElement>('wifi-selected-ssid')
+export const saveBtn = requireElement<HTMLButtonElement>('btn-wifi-save')
+export const successCallout =
+  requireElement<HTMLDivElement>('wifi-save-success')
