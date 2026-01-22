@@ -31,6 +31,19 @@ export type SaveWifiReq = {
   passphrase: string
 }
 
+export type SetTimeReq = {
+  timestamp: number
+}
+
+export type DeviceTime = {
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
+  second: number
+}
+
 const saveSecret = async ({ name, secret }: SaveSecretOpts) => {
   const resp = await fetch('/secrets', {
     method: 'POST',
@@ -100,6 +113,31 @@ const saveWifi = async ({ ssid, passphrase }: SaveWifiReq) => {
   return resp.status === 200
 }
 
+const setTime = async (timestamp: number) => {
+  const resp = await fetch('/time', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ timestamp }),
+  })
+
+  return resp.status === 200
+}
+
+const getTime = async (): Promise<DeviceTime | null> => {
+  const resp = await fetch('/time', {
+    method: 'GET',
+  })
+
+  if (resp.status !== 200) {
+    return null
+  }
+
+  const body: DeviceTime = await resp.json()
+  return body
+}
+
 export const Api = {
   saveSecret,
   getSecrets,
@@ -107,4 +145,6 @@ export const Api = {
   getCurrentWifi,
   scanWifiNetworks,
   saveWifi,
+  setTime,
+  getTime,
 }

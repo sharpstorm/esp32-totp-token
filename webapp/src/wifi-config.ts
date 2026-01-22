@@ -7,7 +7,7 @@ import {
   saveBtn,
   scanBtn,
   selectedSsidDiv,
-  successCallout,
+  wifiSaveSuccessCallout,
 } from './bindings'
 import { makeNode, removeAllChildren } from './dom-utils'
 
@@ -65,9 +65,9 @@ export const bindWifiConfigInteractions = () => {
         selectedSsid = null
 
         // Show success message
-        successCallout.classList.add('show')
+        wifiSaveSuccessCallout.classList.add('show')
         setTimeout(() => {
-          successCallout.classList.remove('show')
+          wifiSaveSuccessCallout.classList.remove('show')
         }, 3000)
       } else {
         alert('Failed to save WiFi configuration')

@@ -31,4 +31,7 @@ class AppServer {
   ResourceNode secretsApiGetSecrets;
   ResourceNode secretsApiSaveSecret;
   ResourceNode secretsApiDeleteSecret;
+
+  ResourceNode timeSyncApiGet;
+  ResourceNode timeSyncApiSet;
 };

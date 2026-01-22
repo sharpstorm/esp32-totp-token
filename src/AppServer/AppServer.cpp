@@ -3,6 +3,7 @@
 #include "handlers/AppHandlers.h"
 #include "handlers/HttpUtil.h"
 #include "handlers/SecretsConfigApi.h"
+#include "handlers/TimeConfigApi.h"
 #include "handlers/WifiConfigApi.h"
 
 AppServer::AppServer()
@@ -22,7 +23,10 @@ AppServer::AppServer()
       secretsApiGetSecrets("/secrets", "GET", &SecretsConfigApi::getSecrets),
       secretsApiSaveSecret("/secrets", "POST", &SecretsConfigApi::saveSecret),
       secretsApiDeleteSecret("/secrets", "DELETE",
-                             &SecretsConfigApi::deleteSecret) {
+                             &SecretsConfigApi::deleteSecret),
+
+      timeSyncApiGet("/time", "GET", &TimeConfigApi::getTime),
+      timeSyncApiSet("/time", "PUT", &TimeConfigApi::setTime) {
   webServer.addMiddleware(&AppServer::captiveRedirectMiddleware);
   // Register routes
   webServer.registerNode(&routeRoot);
@@ -38,6 +42,9 @@ AppServer::AppServer()
   webServer.registerNode(&secretsApiGetSecrets);
   webServer.registerNode(&secretsApiSaveSecret);
   webServer.registerNode(&secretsApiDeleteSecret);
+
+  webServer.registerNode(&timeSyncApiGet);
+  webServer.registerNode(&timeSyncApiSet);
 }
 
 void AppServer::start() { webServer.start(); }

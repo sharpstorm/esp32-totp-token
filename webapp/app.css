@@ -745,6 +745,77 @@
   box-shadow: none;
 }
 
+/* Time Sync Styles */
+#time-sync-content-container {
+  display: none;
+}
+
+#time-sync-content-container.content-pane-active {
+  display: block;
+}
+
+.info-box {
+  padding: 1rem;
+  background: #f7f8ff;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e5f5;
+  margin-bottom: 1.5rem;
+}
+
+.info-box-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2d2a4a;
+  margin-bottom: 0.5rem;
+}
+
+.info-box-message {
+  font-size: 0.85rem;
+  color: #5c5a87;
+  line-height: 1.5;
+}
+
+#time-sync-current,
+#time-sync-browser {
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #d6d9f0;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.time-label {
+  font-size: 0.85rem;
+  color: #5c5a87;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.time-display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d2a4a;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.time-date {
+  font-size: 1.1rem;
+  color: #5c5a87;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 1rem;
+}
+
+#btn-time-refresh,
+#btn-time-sync {
+  width: 100%;
+}
+
+#time-sync-success {
+  margin-top: 0;
+}
+
 /* Mobile optimizations for secret management */
 @media (max-width: 600px) {
   .secret-list-item {
@@ -761,5 +832,13 @@
     margin-left: 0;
     width: 100%;
     padding: 0.625rem 1rem;
+  }
+
+  .time-display {
+    font-size: 2rem;
+  }
+
+  .time-date {
+    font-size: 0.95rem;
   }
 }

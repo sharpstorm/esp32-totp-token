@@ -1,4 +1,4 @@
-export type ContentTabId = 'wifiConfig' | 'secretConfig'
+export type ContentTabId = 'wifiConfig' | 'secretConfig' | 'timeSync'
 export type AppContentContainerState = {
   activeTab: ContentTabId
 }

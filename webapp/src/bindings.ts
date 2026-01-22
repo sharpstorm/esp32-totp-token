@@ -33,11 +33,15 @@ export const tabWifiConfig =
   requireElement<HTMLButtonElement>('tab-wifi-config')
 export const tabSecretConfig =
   requireElement<HTMLButtonElement>('tab-secret-config')
+export const tabTimeSync = requireElement<HTMLButtonElement>('tab-time-sync')
 export const contentPaneWifiConfig = requireElement<HTMLDivElement>(
   'wifi-config-content-container',
 )
 export const contentPaneSecretConfig = requireElement<HTMLDivElement>(
   'secret-config-content-container',
+)
+export const contentPaneTimeSync = requireElement<HTMLDivElement>(
+  'time-sync-content-container',
 )
 
 export const secretConfigInputName =
@@ -73,7 +77,7 @@ export const passphraseInput = requireElement<HTMLInputElement>(
 export const selectedSsidDiv =
   requireElement<HTMLSpanElement>('wifi-selected-ssid')
 export const saveBtn = requireElement<HTMLButtonElement>('btn-wifi-save')
-export const successCallout =
+export const wifiSaveSuccessCallout =
   requireElement<HTMLDivElement>('wifi-save-success')
 
 export const modal = requireElement<HTMLDivElement>('modal')
@@ -97,3 +101,19 @@ export const secretsList = requireElement<HTMLDivElement>(
 export const secretsUpdateStatus = requireElement<HTMLDivElement>(
   'secret-config-manage-status',
 )
+
+export const timeCurrentDisplay = requireElement<HTMLDivElement>(
+  'time-current-display',
+)
+export const timeCurrentDate =
+  requireElement<HTMLDivElement>('time-current-date')
+export const timeBrowserDisplay = requireElement<HTMLDivElement>(
+  'time-browser-display',
+)
+export const timeBrowserDate =
+  requireElement<HTMLDivElement>('time-browser-date')
+export const timeSyncRefreshBtn =
+  requireElement<HTMLButtonElement>('btn-time-refresh')
+export const timeSyncBtn = requireElement<HTMLButtonElement>('btn-time-sync')
+export const timeSyncSuccessCallout =
+  requireElement<HTMLDivElement>('time-sync-success')

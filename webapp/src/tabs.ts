@@ -1,8 +1,10 @@
 import { ContentTabId, appContentContainerState } from './app-state'
 import {
   contentPaneSecretConfig,
+  contentPaneTimeSync,
   contentPaneWifiConfig,
   tabSecretConfig,
+  tabTimeSync,
   tabWifiConfig,
 } from './bindings'
 import { removeClassFromAllElements } from './dom-utils'
@@ -23,6 +25,11 @@ const tabDefinitions: TabDefinition[] = [
     tabButton: tabSecretConfig,
     tabId: 'secretConfig',
     contentPane: contentPaneSecretConfig,
+  },
+  {
+    tabButton: tabTimeSync,
+    tabId: 'timeSync',
+    contentPane: contentPaneTimeSync,
   },
 ]
 

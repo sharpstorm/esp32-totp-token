@@ -14,6 +14,7 @@
     <div id="tab-container" class="tab-container">
       <button id="tab-wifi-config" class="tab tab-active">WiFi Config</button>
       <button id="tab-secret-config" class="tab">Secret Config</button>
+      <button id="tab-time-sync" class="tab">Time Sync</button>
     </div>
     <hr style="margin-bottom: 1rem;" />
     <div id="content-container">
@@ -86,6 +87,38 @@
           <button id="secret-config-manage-refresh-btn">Refresh List</button>
           <div id="secret-config-manage-list" class="secret-list"></div>
           <div class="status" id="secret-config-manage-status">Click "Refresh List" to load secrets</div>
+        </div>
+      </div>
+      <div id="time-sync-content-container" class="content-pane">
+        <div class="info-box">
+          <div class="info-box-title">Device Time Sync</div>
+          <div class="info-box-message">
+            Use this to sync your device's time without NTP. Your browser will send its current time to the device.
+          </div>
+        </div>
+
+        <div id="time-sync-current">
+          <div class="time-label">Current Device Time</div>
+          <div id="time-current-display" class="time-display">--:--:--</div>
+          <div id="time-current-date" class="time-date">----/--/--</div>
+          <button id="btn-time-refresh">Refresh</button>
+        </div>
+
+        <div id="time-sync-browser">
+          <div class="time-label">Your Browser Time</div>
+          <div id="time-browser-display" class="time-display">--:--:--</div>
+          <div id="time-browser-date" class="time-date">----/--/--</div>
+          <button id="btn-time-sync">Sync Time from Browser</button>
+        </div>
+
+        <div class="success-callout" id="time-sync-success">
+          <div class="success-icon">✓</div>
+          <div class="success-content">
+            <div class="success-title">Time Synced</div>
+            <div class="success-message">
+              Device time has been updated successfully.
+            </div>
+          </div>
         </div>
       </div>
     </div>
