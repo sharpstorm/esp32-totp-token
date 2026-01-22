@@ -22,15 +22,6 @@ export const startBtn = requireElement<HTMLButtonElement>(
 export const stopBtn = requireElement<HTMLButtonElement>(
   'secret-config-scan-stop-btn',
 )
-export const resultBox = requireElement<HTMLDivElement>(
-  'secret-config-scan-result',
-)
-export const resultUrl = requireElement<HTMLDivElement>(
-  'secret-config-scan-result-url',
-)
-export const resultItemsContainer = requireElement<HTMLDivElement>(
-  'secret-config-scan-result-items-container',
-)
 export const status = requireElement<HTMLDivElement>(
   'secret-config-scan-status',
 )
@@ -84,3 +75,12 @@ export const selectedSsidDiv =
 export const saveBtn = requireElement<HTMLButtonElement>('btn-wifi-save')
 export const successCallout =
   requireElement<HTMLDivElement>('wifi-save-success')
+
+export const modal = requireElement<HTMLDivElement>('qr-scan-modal')!
+export const modalTitle = requireElement<HTMLTitleElement>('modal-title')!
+export const modalBody = requireElement<HTMLDivElement>('modal-body')!
+export const modalCloseBtn =
+  requireElement<HTMLButtonElement>('modal-close-btn')!
+export const modalCancelBtn =
+  requireElement<HTMLButtonElement>('modal-cancel-btn')!
+export const modalSaveBtn = requireElement<HTMLButtonElement>('modal-save-btn')!

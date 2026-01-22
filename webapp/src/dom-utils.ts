@@ -9,13 +9,13 @@ export const getDOMElementById = <T extends HTMLElement>(id: string): T => {
 
 export const makeNode = (
   nodeType: string,
-  props: Partial<Record<keyof HTMLElement, string>>,
+  props: Partial<Record<keyof HTMLElement, string>> & Record<string, unknown>,
   ...children: (HTMLElement | string)[]
 ) => {
   const element = document.createElement(nodeType)
 
   Object.entries(props).forEach(([propName, propValue]) => {
-    ;(element as unknown as Record<string, string>)[propName] = propValue
+    ;(element as unknown as Record<string, unknown>)[propName] = propValue
   })
 
   for (const child of children) {
