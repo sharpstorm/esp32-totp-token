@@ -70,29 +70,29 @@ void SecretsConfigApi::saveSecret(HTTPRequest* req, HTTPResponse* res) {
 }
 
 void SecretsConfigApi::deleteSecret(HTTPRequest* req, HTTPResponse* res) {
-  unique_ptr<char[]> reqBodyText = HttpUtil::readRequestBody(req, 200);
+  // Get name from query parameter
+  ResourceParameters* params = req->getParams();
+  string indexParam;
+  params->getQueryParameter("index", indexParam);
 
-  if (reqBodyText == nullptr) {
-    res->setStatusCode(413);
-    res->println("Request entity too large");
-    return;
-  }
-
-  JsonDocument reqBody;
-  JsonDocument filter;
-  filter["index"] = true;
-  deserializeJson(reqBody, reqBodyText.get(),
-                  DeserializationOption::Filter(filter));
-
-  if (reqBody["index"].isUnbound()) {
+  if (indexParam.empty()) {
     res->setStatusCode(400);
     res->setHeader(HttpHeader::ContentType, MimeType::JSON);
-    res->println("{ \"success\": false }");
+    res->println(
+        "{ \"success\": false, \"error\": \"Missing index parameter\" }");
     return;
   }
 
-  int indexToDelete = reqBody["index"].as<int>();
+  int indexToDelete = stoi(indexParam);
+
+  // Find the secret by name
   secretManager.start();
+  int secretCount = secretManager.getSecretCount();
+  if (indexToDelete < 0 || indexToDelete >= secretCount) {
+    res->println("{ \"success\": false, \"error\": \"Invalid Index\" }");
+    return;
+  }
+
   secretManager.deleteRecord(indexToDelete);
 
   res->setStatusCode(200);
