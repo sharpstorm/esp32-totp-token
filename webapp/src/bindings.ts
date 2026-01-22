@@ -76,11 +76,24 @@ export const saveBtn = requireElement<HTMLButtonElement>('btn-wifi-save')
 export const successCallout =
   requireElement<HTMLDivElement>('wifi-save-success')
 
-export const modal = requireElement<HTMLDivElement>('qr-scan-modal')!
-export const modalTitle = requireElement<HTMLTitleElement>('modal-title')!
-export const modalBody = requireElement<HTMLDivElement>('modal-body')!
+export const modal = requireElement<HTMLDivElement>('modal')
+export const modalTitle = requireElement<HTMLTitleElement>('modal-title')
+export const modalBody = requireElement<HTMLDivElement>('modal-body')
 export const modalCloseBtn =
-  requireElement<HTMLButtonElement>('modal-close-btn')!
+  requireElement<HTMLButtonElement>('modal-close-btn')
 export const modalCancelBtn =
-  requireElement<HTMLButtonElement>('modal-cancel-btn')!
-export const modalSaveBtn = requireElement<HTMLButtonElement>('modal-save-btn')!
+  requireElement<HTMLButtonElement>('modal-cancel-btn')
+export const modalSaveBtn = requireElement<HTMLButtonElement>('modal-save-btn')
+
+export const secretsManageBtn = requireElement<HTMLButtonElement>(
+  'secret-config-manage-btn',
+)
+export const secretsRefreshBtn = requireElement<HTMLButtonElement>(
+  'secret-config-manage-refresh-btn',
+)
+export const secretsList = requireElement<HTMLDivElement>(
+  'secret-config-manage-list',
+)
+export const secretsUpdateStatus = requireElement<HTMLDivElement>(
+  'secret-config-manage-status',
+)

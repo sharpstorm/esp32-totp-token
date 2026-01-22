@@ -19,6 +19,7 @@ import {
   modal,
   modalTitle,
   modalBody,
+  secretsManageBtn as secretConfigManageButton,
 } from './bindings'
 import { makeNode, removeAllChildren } from './dom-utils'
 import { parseQrPayload } from './parsers/payload-parser'
@@ -33,17 +34,28 @@ export const bindSecretInputInteractions = () => {
 
 const bindModeSelector = () => {
   secretConfigManualButton.addEventListener('click', () => {
-    contentPaneSecretConfig.classList.remove('scan-mode')
+    contentPaneSecretConfig.classList.remove('scan-mode', 'manage-mode')
     contentPaneSecretConfig.classList.add('input-mode')
     secretConfigScanButton.classList.remove('tab-active')
+    secretConfigManageButton.classList.remove('tab-active')
     secretConfigManualButton.classList.add('tab-active')
   })
 
   secretConfigScanButton.addEventListener('click', () => {
-    contentPaneSecretConfig.classList.remove('input-mode')
+    contentPaneSecretConfig.classList.remove('input-mode', 'manage-mode')
     contentPaneSecretConfig.classList.add('scan-mode')
     secretConfigManualButton.classList.remove('tab-active')
+    secretConfigManageButton.classList.remove('tab-active')
     secretConfigScanButton.classList.add('tab-active')
+  })
+
+  secretConfigManageButton.addEventListener('click', () => {
+    contentPaneSecretConfig.classList.remove('input-mode', 'scan-mode')
+    contentPaneSecretConfig.classList.add('manage-mode')
+
+    secretConfigManualButton.classList.remove('tab-active')
+    secretConfigScanButton.classList.remove('tab-active')
+    secretConfigManageButton.classList.add('tab-active')
   })
 }
 

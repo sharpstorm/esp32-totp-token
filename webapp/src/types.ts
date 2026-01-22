@@ -14,3 +14,14 @@ export type OtpParameters = {
   name: string
   issuer: string
 }
+
+export type AddPrefix<TKey, TPrefix extends string> = TKey extends string
+  ? `${TPrefix}${Capitalize<TKey>}`
+  : never
+
+export type AddPrefixToObject<
+  TObject extends object,
+  TPrefix extends string,
+> = {
+  [K in keyof TObject as AddPrefix<K, TPrefix>]: TObject[K]
+}

@@ -56,6 +56,14 @@ const getSecrets = async () => {
   return body.secrets
 }
 
+const deleteSecret = async (index: number) => {
+  const resp = await fetch(`/secrets?index=${index}`, {
+    method: 'DELETE',
+  })
+
+  return resp.status === 200
+}
+
 const getCurrentWifi = async (): Promise<string | null> => {
   const resp = await fetch('/wifi/config')
 
@@ -95,6 +103,7 @@ const saveWifi = async ({ ssid, passphrase }: SaveWifiReq) => {
 export const Api = {
   saveSecret,
   getSecrets,
+  deleteSecret,
   getCurrentWifi,
   scanWifiNetworks,
   saveWifi,

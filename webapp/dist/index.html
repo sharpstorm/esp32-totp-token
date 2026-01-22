@@ -50,6 +50,7 @@
         <div id="secret-config-mode" class="tab-container">
           <button id="secret-config-manual-btn" class="tab tab-active">Manual Input</button>
           <button id="secret-config-scan-btn" class="tab">Scan</button>
+          <button id="secret-config-manage-btn" class="tab">Manage</button>
         </div>
 
         <div id="secret-config-input">
@@ -80,14 +81,29 @@
           <button id="secret-config-scan-stop-btn" style="display: none;">Stop Camera</button>
 
           <div class="status" id="secret-config-scan-status">Click "Start Camera" to begin scanning</div>
-
-          <div id="secret-config-scan-result">
-            <h2>QR Code Detected!</h2>
-            <div id="secret-config-scan-result-url"></div>
-            <div id="secret-config-scan-result-items-container">
-            </div>
-          </div>
         </div>
+        <div id="secret-config-manage">
+          <button id="secret-config-manage-refresh-btn">Refresh List</button>
+          <div id="secret-config-manage-list" class="secret-list"></div>
+          <div class="status" id="secret-config-manage-status">Click "Refresh List" to load secrets</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Scan Confirmation Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Confirm TOTP Secret</h2>
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Content will be dynamically inserted -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+        <button class="btn btn-primary" id="modal-save-btn">Save</button>
       </div>
     </div>
   </div>
