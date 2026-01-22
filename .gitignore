@@ -7,3 +7,6 @@
 **/SslCertStore.cpp
 node_modules
 cert/*
+
+**/*.der
+**/*.pem
