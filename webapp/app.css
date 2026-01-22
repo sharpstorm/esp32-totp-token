@@ -744,3 +744,22 @@
   transform: none;
   box-shadow: none;
 }
+
+/* Mobile optimizations for secret management */
+@media (max-width: 600px) {
+  .secret-list-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .secret-list-item-name {
+    margin-bottom: 0;
+  }
+
+  .secret-list-item-delete {
+    margin-left: 0;
+    width: 100%;
+    padding: 0.625rem 1rem;
+  }
+}
