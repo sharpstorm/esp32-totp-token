@@ -45,6 +45,7 @@ Secret SecretManager::readRecord(uint8_t index) {
                                           secret.byteLen());
   if (bytesRead != secret.byteLen()) {
     Serial.println("Failed to read secret");
+    preferences.end();
     return Secret(0);
   }
   secret.setName(preferences.getString(keyNames.cNameKey()));
@@ -53,7 +54,13 @@ Secret SecretManager::readRecord(uint8_t index) {
   return secret;
 }
 
-void SecretManager::putRecord(Secret* secret) {
+bool SecretManager::putRecord(Secret* secret) {
+  // secretCount is a uint8_t: the 256th insert used to wrap it to 0 and
+  // silently orphan every stored secret.
+  if (secret == nullptr || !secret->isValid() || secretCount >= 255) {
+    return false;
+  }
+
   StoredKey keyNames = StoredKey(String(secretCount));
 
   preferences.begin(SECRET_NAMESPACE, false);
@@ -63,6 +70,7 @@ void SecretManager::putRecord(Secret* secret) {
   secretCount++;
   preferences.putUChar(SECRET_INDEX, secretCount);
   preferences.end();
+  return true;
 }
 
 bool SecretManager::deleteRecord(uint8_t index) {
@@ -104,6 +112,27 @@ bool SecretManager::deleteRecord(uint8_t index) {
   preferences.putUChar(SECRET_INDEX, secretCount);
   preferences.end();
 
+  return true;
+}
+
+bool SecretManager::updateRecord(uint8_t index, const String& name,
+                                 Secret* secret) {
+  if (!isIndexValid(index) || name.length() == 0) {
+    return false;
+  }
+  if (secret != nullptr && !secret->isValid()) {
+    return false;
+  }
+
+  StoredKey keyNames = StoredKey(String(index));
+  preferences.begin(SECRET_NAMESPACE, false);
+  if (secret != nullptr) {
+    preferences.putUShort(keyNames.cSizeKey(), secret->bitLen());
+    preferences.putBytes(keyNames.cSecretKey(), secret->get(),
+                         secret->byteLen());
+  }
+  preferences.putString(keyNames.cNameKey(), name);
+  preferences.end();
   return true;
 }
 

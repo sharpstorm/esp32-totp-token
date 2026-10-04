@@ -1,29 +1,33 @@
 #include "Base32.h"
 
+// Encodes `bitLength` bits from `in` as RFC 4648 base32 (no '=' padding).
+// The caller owns `out` (NUL-terminated) and must free() it.
+// Returns the number of characters written, or 0 on failure (out = nullptr).
 int Base32::toBase32(byte* in, long bitLength, byte*& out) {
-  char base32StandardAlphabet[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"};
+  static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  out = nullptr;
 
-  int bufSize = 8;
-  int index = 0;
-  int size = 0;  // size of temporary array
-  byte* temp = NULL;
-
-  if (bitLength < 0 || bitLength > 268435456LL) {
+  if (in == nullptr || bitLength <= 0 || bitLength > 268435456LL) {
     return 0;
   }
 
-  size = bitLength / 5;
-  temp = (byte*)malloc(size);  // Allocating temporary array.
+  // Round up: a trailing partial group still needs a character.
+  const long size = (bitLength + 4) / 5;
+  const long inByteLen = (bitLength + 7) / 8;
 
-  int buffer = in[0];
-  int next = 1;
+  out = (byte*)malloc(size + 1);
+  if (out == nullptr) {
+    return 0;
+  }
+
+  uint32_t buffer = in[0];
+  long next = 1;
   int bitsLeft = 8;
-  for (int i = 0; i < size; i++) {
+  for (long i = 0; i < size; i++) {
     if (bitsLeft < 5) {
-      if (next < size) {
-        buffer <<= 8;
-        buffer |= in[next] & 0xFF;
-        next++;
+      // Only pull more bytes while there is input left; otherwise zero-pad.
+      if (next < inByteLen) {
+        buffer = (buffer << 8) | (in[next++] & 0xFF);
         bitsLeft += 8;
       } else {
         int pad = 5 - bitsLeft;
@@ -31,36 +35,44 @@ int Base32::toBase32(byte* in, long bitLength, byte*& out) {
         bitsLeft += pad;
       }
     }
-    index = 0x1F & (buffer >> (bitsLeft - 5));
-
+    int index = 0x1F & (buffer >> (bitsLeft - 5));
     bitsLeft -= 5;
-    temp[i] = (byte)base32StandardAlphabet[index];
+    buffer &= (1u << bitsLeft) - 1;  // keep only unconsumed bits
+    out[i] = (byte)alphabet[index];
   }
-
-  out = (byte*)malloc(size + 1);
-  memcpy(out, temp, size);
   out[size] = 0;
-  free(temp);
 
-  return size;
+  return (int)size;
 }
 
+// Decodes base32 (case-insensitive; whitespace, '-' and '=' are ignored).
+// The caller owns `out` and must free() it.
+// Returns the number of decoded bytes, or -1 on invalid input (out = nullptr).
 int Base32::fromBase32(byte* in, long length, byte*& out) {
-  int result = 0;  // Length of the array of decoded values.
-  int buffer = 0;
+  out = nullptr;
+  if (in == nullptr || length < 0) {
+    return -1;
+  }
+
+  int result = 0;
+  uint32_t buffer = 0;
   int bitsLeft = 0;
-  byte* temp = NULL;
 
-  temp = (byte*)malloc(length);  // Allocating temporary array.
+  // Decoded output is never larger than the input.
+  byte* temp = (byte*)malloc(length > 0 ? length : 1);
+  if (temp == nullptr) {
+    return -1;
+  }
 
-  for (int i = 0; i < length; i++) {
+  for (long i = 0; i < length; i++) {
     byte ch = in[i];
 
-    // ignoring some characters: ' ', '\t', '\r', '\n', '='
-    if (ch == 0xA0 || ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x3D)
+    // Ignore separators and padding: ' ', NBSP, '\t', '\n', '\r', '-', '='
+    if (ch == 0x20 || ch == 0xA0 || ch == 0x09 || ch == 0x0A || ch == 0x0D ||
+        ch == 0x2D || ch == 0x3D)
       continue;
 
-    // recovering mistyped: '0' -> 'O', '1' -> 'L', '8' -> 'B'
+    // Recover common typos: '0' -> 'O', '1' -> 'L', '8' -> 'B'
     if (ch == 0x30) {
       ch = 0x4F;
     } else if (ch == 0x31) {
@@ -69,31 +81,24 @@ int Base32::fromBase32(byte* in, long length, byte*& out) {
       ch = 0x42;
     }
 
-    // look up one base32 symbols: from 'A' to 'Z' or from 'a' to 'z' or from
-    // '2' to '7'
     if ((ch >= 0x41 && ch <= 0x5A) || (ch >= 0x61 && ch <= 0x7A)) {
       ch = ((ch & 0x1F) - 1);
     } else if (ch >= 0x32 && ch <= 0x37) {
       ch -= (0x32 - 26);
     } else {
       free(temp);
-      return 0;
+      return -1;
     }
 
-    buffer <<= 5;
-    buffer |= ch;
+    buffer = (buffer << 5) | ch;
     bitsLeft += 5;
     if (bitsLeft >= 8) {
-      temp[result] =
-          (unsigned char)((unsigned int)(buffer >> (bitsLeft - 8)) & 0xFF);
-      result++;
+      temp[result++] = (byte)((buffer >> (bitsLeft - 8)) & 0xFF);
       bitsLeft -= 8;
+      buffer &= (1u << bitsLeft) - 1;
     }
   }
 
-  out = (byte*)malloc(result);
-  memcpy(out, temp, result);
-  free(temp);
-
+  out = temp;
   return result;
 }

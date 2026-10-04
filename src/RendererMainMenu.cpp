@@ -34,6 +34,10 @@ void MainMenuRenderer::renderLoop() {
       case 4:
         tft->drawString("Token Info", 8, 24);
         break;
+      case 5:
+        tft->drawString("Config Via", 8, 24);
+        tft->drawString("Bluetooth", 8, 48);
+        break;
     }
 
     isDirty = false;
@@ -41,7 +45,7 @@ void MainMenuRenderer::renderLoop() {
 }
 
 void MainMenuRenderer::handleTopButton() {
-  menuSelection = (menuSelection + 1) % 5;
+  menuSelection = (menuSelection + 1) % 6;
   isDirty = true;
 }
 
@@ -61,6 +65,9 @@ void MainMenuRenderer::handleBottomButton() {
       break;
     case 4:
       screenMutator->setState(MENU_STATE_INFO);
+      break;
+    case 5:
+      screenMutator->setState(MENU_STATE_BT_CONFIG);
       break;
 
     default:

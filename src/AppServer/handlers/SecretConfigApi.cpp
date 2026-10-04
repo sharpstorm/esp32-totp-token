@@ -53,16 +53,23 @@ void SecretsConfigApi::saveSecret(HTTPRequest* req, HTTPResponse* res) {
   String secretBase32 = reqBody["secret"].as<String>();
   String secretName = reqBody["name"].as<String>();
 
-  byte* secretBytes;
-  Base32::fromBase32((byte*)secretBase32.c_str(), secretBase32.length(),
-                     secretBytes);
-  Secret secret(secretBase32.length() * 5);
-  memcpy(secret.get(), secretBytes, secret.byteLen());
-  free(secretBytes);
+  Secret secret = Secret::fromBase32((const uint8_t*)secretBase32.c_str(),
+                                     secretBase32.length());
+  if (!secret.isValid() || secretName.length() == 0) {
+    res->setStatusCode(400);
+    res->setHeader(HttpHeader::ContentType, MimeType::JSON);
+    res->println("{ \"success\": false, \"error\": \"Invalid secret\" }");
+    return;
+  }
 
   secret.setName(secretName);
   secretManager.start();
-  secretManager.putRecord(&secret);
+  if (!secretManager.putRecord(&secret)) {
+    res->setStatusCode(507);
+    res->setHeader(HttpHeader::ContentType, MimeType::JSON);
+    res->println("{ \"success\": false, \"error\": \"Storage full\" }");
+    return;
+  }
 
   res->setStatusCode(200);
   res->setHeader(HttpHeader::ContentType, MimeType::JSON);
@@ -83,12 +90,19 @@ void SecretsConfigApi::deleteSecret(HTTPRequest* req, HTTPResponse* res) {
     return;
   }
 
-  int indexToDelete = stoi(indexParam);
+  // stoi() throws on non-numeric input, which aborts (reboots) the device.
+  char* end = nullptr;
+  long indexToDelete = strtol(indexParam.c_str(), &end, 10);
+  if (end == indexParam.c_str() || *end != '\0') {
+    indexToDelete = -1;
+  }
 
   // Find the secret by name
   secretManager.start();
   int secretCount = secretManager.getSecretCount();
   if (indexToDelete < 0 || indexToDelete >= secretCount) {
+    res->setStatusCode(400);
+    res->setHeader(HttpHeader::ContentType, MimeType::JSON);
     res->println("{ \"success\": false, \"error\": \"Invalid Index\" }");
     return;
   }

@@ -13,7 +13,7 @@ WifiManager::WifiManager() {
       (byte)((espChipId >> 32) & 0xFF),
   };
   byte* deviceIdString;
-  Base32::toBase32(deviceId, 64, deviceIdString);
+  Base32::toBase32(deviceId, 40, deviceIdString);
 
   char basePrefix[] = HOTSPOT_SSID_PREFIX;
   strcpy(hotspotName, basePrefix);

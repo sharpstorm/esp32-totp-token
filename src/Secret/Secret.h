@@ -16,7 +16,13 @@ class Secret {
  public:
   Secret(uint16_t secretBitLen);
   Secret(const Secret& other);
+  Secret& operator=(const Secret& other) = delete;
   ~Secret();
+
+  // Decodes a base32 secret. The secret length is taken from the number of
+  // bytes actually decoded (padding/whitespace ignored), never from the input
+  // character count. Returns an invalid Secret (bitLen 0) on bad input.
+  static Secret fromBase32(const uint8_t* base32, size_t len);
 
   uint8_t* get();
   const uint16_t bitLen();

@@ -196,13 +196,18 @@ void ConfigRenderer::handleCreate() {
     return;
   }
 
-  byte* secretBytes;
   char* nameBytes;
-  Base32::fromBase32((byte*)bufPtr, buffer[0], secretBytes);
-
-  Secret secret(buffer[0] * 5);
-  memcpy(secret.get(), secretBytes, secret.byteLen());
-  free(secretBytes);
+  Secret secret = Secret::fromBase32((const uint8_t*)bufPtr, buffer[0]);
+  if (!secret.isValid()) {
+    free(bufPtr);
+    bufPtr = nullptr;
+    tft->fillRect(0, 32, 180, 50, TFT_BLACK);
+    tft->setTextSize(1);
+    tft->drawString("Invalid secret", 8, 32);
+    timestamp = millis();
+    serialState = CONFIG_STATE_WAIT_CLEAR;
+    return;
+  }
 
   nameBytes = (char*)malloc(buffer[1] + 1);
   memcpy(nameBytes, ((byte*)bufPtr) + buffer[0], buffer[1]);
@@ -210,7 +215,6 @@ void ConfigRenderer::handleCreate() {
 
   secret.setName(String(nameBytes));
   secretManager.putRecord(&secret);
-  free(nameBytes);
 
   tft->fillRect(0, 32, 180, 50, TFT_BLACK);
   tft->setTextSize(1);
@@ -218,9 +222,7 @@ void ConfigRenderer::handleCreate() {
   tft->drawString(String(secret.byteLen()).c_str(), 8, 44);
   tft->drawString("bytes, Pos:", 40, 44);
   tft->drawString(String(secretManager.getSecretCount() - 1).c_str(), 140, 44);
-  Base32::toBase32(secret.get(), secret.bitLen(), secretBytes);
   tft->drawString(nameBytes, 8, 56);
-  free(secretBytes);
 
   free(bufPtr);
   bufPtr = nullptr;

@@ -6,8 +6,10 @@
 
 class Base32 {
  public:
-  static int toBase32(byte*, long, byte*&);
-  static int fromBase32(byte*, long, byte*&);
+  // Returns chars written (0 on failure). Caller frees `out`.
+  static int toBase32(byte* in, long bitLength, byte*& out);
+  // Returns decoded byte count (-1 on invalid input). Caller frees `out`.
+  static int fromBase32(byte* in, long length, byte*& out);
 };
 
 #endif

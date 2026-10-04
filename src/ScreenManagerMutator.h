@@ -9,6 +9,7 @@
 #define MENU_STATE_CONFIG 4
 #define MENU_STATE_INFO 5
 #define MENU_STATE_WIFI_CONFIG 6
+#define MENU_STATE_BT_CONFIG 7
 
 class ScreenManagerMutator {
  public:

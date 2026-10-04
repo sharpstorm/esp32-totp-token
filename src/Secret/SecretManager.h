@@ -25,8 +25,12 @@ class SecretManager {
   void clear();
 
   Secret readRecord(uint8_t index);
-  void putRecord(Secret* secret);
+  // Returns false if the store is full (count is a uint8_t) or invalid.
+  bool putRecord(Secret* secret);
   bool deleteRecord(uint8_t index);
+  // Rename and/or replace the secret at `index`. If `secret` is null only
+  // the name is changed. Returns false on an invalid index or empty name.
+  bool updateRecord(uint8_t index, const String& name, Secret* secret);
   int getSecretCount();
   bool isIndexValid(uint8_t index);
 };

@@ -7,6 +7,7 @@
 
 #include "IInputHandler.h"
 #include "RendererConfig.h"
+#include "RendererBtConfig.h"
 #include "RendererInfo.h"
 #include "RendererMainMenu.h"
 #include "RendererOtp.h"
@@ -32,6 +33,7 @@ class ScreenManager : public ScreenManagerMutator {
   ConfigRenderer configRenderer;
   InfoRenderer infoRenderer;
   WifiConfigRenderer wifiConfigRenderer;
+  BtConfigRenderer btConfigRenderer;
 
   IInputHandler* activeHandler;
 

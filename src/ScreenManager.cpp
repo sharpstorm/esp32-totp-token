@@ -8,6 +8,7 @@ ScreenManager::ScreenManager(M5Display* tftRef)
       configRenderer(tftRef, this),
       infoRenderer(tftRef, this),
       wifiConfigRenderer(tftRef, this),
+      btConfigRenderer(tftRef, this),
       activeHandler(&mainMenuRenderer) {}
 
 void ScreenManager::setState(int state) {
@@ -32,6 +33,9 @@ void ScreenManager::setState(int state) {
       break;
     case MENU_STATE_WIFI_CONFIG:
       activeHandler = &wifiConfigRenderer;
+      break;
+    case MENU_STATE_BT_CONFIG:
+      activeHandler = &btConfigRenderer;
       break;
     default:
       activeHandler = &mainMenuRenderer;
@@ -109,6 +113,9 @@ void ScreenManager::renderLoop() {
       break;
     case MENU_STATE_WIFI_CONFIG:
       wifiConfigRenderer.renderLoop();
+      break;
+    case MENU_STATE_BT_CONFIG:
+      btConfigRenderer.renderLoop();
       break;
     default:
       break;
