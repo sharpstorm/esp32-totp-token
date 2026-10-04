@@ -1,0 +1,143 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  webapp:
+    name: Build web app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - run: npm ci
+      - run: npm run build   # tsc type-check + vite build -> webapp/dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webapp-dist
+          path: webapp/dist
+          if-no-files-found: error
+
+  companion:
+    name: Companion web app (single file)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: companion/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: companion/web/package-lock.json
+      - run: npm ci
+      - run: npm run build   # -> public/index.html + public/_headers
+      - uses: actions/upload-artifact@v4
+        with:
+          name: companion-web
+          path: companion/web/public
+
+  firmware:
+    name: Build firmware (m5stick-c)
+    needs: webapp
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Firmware embeds webapp/dist/* (board_build.embed_txtfiles), so always
+      # use the freshly built frontend rather than whatever is committed.
+      - name: Download web app build
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp-dist
+          path: webapp/dist
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio
+          key: pio-${{ runner.os }}-${{ hashFiles('platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      # SslCertStore.cpp is gitignored (it holds the HTTPS server's private
+      # key). Use a key from repository secrets if configured; otherwise
+      # generate a throwaway one so the build works. NOTE: a key baked into
+      # a downloadable binary is readable by anyone who has that binary.
+      - name: Provide TLS certificate
+        env:
+          SSL_CERT_DER_B64: ${{ secrets.SSL_CERT_DER_B64 }}
+          SSL_KEY_DER_B64: ${{ secrets.SSL_KEY_DER_B64 }}
+        run: |
+          set -euo pipefail
+          work="$(mktemp -d)"
+          if [ -n "${SSL_CERT_DER_B64}" ] && [ -n "${SSL_KEY_DER_B64}" ]; then
+            echo "Using certificate from repository secrets"
+            echo "${SSL_CERT_DER_B64}" | base64 -d > "$work/server_cert.der"
+            echo "${SSL_KEY_DER_B64}"  | base64 -d > "$work/server_key.der"
+            to_c_array() { od -An -v -tx1 "$1" | sed -e 's/ \([0-9a-f][0-9a-f]\)/0x\1, /g' -e 's/^/  /'; }
+            {
+              echo '#include "SslCertStore.h"'
+              echo 'unsigned char sslCertDER[] = {';       to_c_array "$work/server_cert.der"; echo '};'
+              echo 'unsigned int sslCertDERLen = sizeof(sslCertDER);'
+              echo 'unsigned char sslPrivateKeyDER[] = {'; to_c_array "$work/server_key.der";  echo '};'
+              echo 'unsigned int sslPrivateKeyDERLen = sizeof(sslPrivateKeyDER);'
+            } > "$work/SslCertStore.cpp"
+          else
+            echo "::warning::No SSL_CERT_DER_B64/SSL_KEY_DER_B64 secrets; generating a throwaway certificate for this build"
+            (cd "$work" && bash "$GITHUB_WORKSPACE/scripts/generate_ec_key.sh" > /dev/null)
+          fi
+          cp "$work/SslCertStore.cpp" src/AppServer/ssl/SslCertStore.cpp
+          rm -rf "$work"
+
+      - name: Build firmware
+        run: pio run -e m5stick-c
+
+      - name: Create merged flash image
+        run: |
+          set -euo pipefail
+          B=.pio/build/m5stick-c
+          BOOT_APP0="$(find ~/.platformio/packages/framework-arduinoespressif32 -name boot_app0.bin | head -n1)"
+          mkdir -p out
+          cp "$B/bootloader.bin" "$B/partitions.bin" "$B/firmware.bin" "$BOOT_APP0" out/
+          # Single image for a fresh device: esptool.py write_flash 0x0 totp-token-m5stick-c-merged.bin
+          python ~/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32 merge_bin \
+            -o out/totp-token-m5stick-c-merged.bin \
+            --flash_mode dio --flash_freq 40m --flash_size 4MB \
+            0x1000  "$B/bootloader.bin" \
+            0x8000  "$B/partitions.bin" \
+            0xe000  "$BOOT_APP0" \
+            0x10000 "$B/firmware.bin"
+          (cd out && sha256sum *.bin > SHA256SUMS)
+          ls -l out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware-m5stick-c
+          path: out/*
+          if-no-files-found: error

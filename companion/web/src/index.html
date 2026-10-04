@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="%%CSP_META%%">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0f14">
+<meta name="description" content="Configure your TOTP hardware token over encrypted Bluetooth.">
+<title>Token Companion</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0f14'/%3E%3Crect x='18' y='10' width='28' height='44' rx='6' fill='none' stroke='%233ddc97' stroke-width='4'/%3E%3Ccircle cx='32' cy='42' r='4' fill='%233ddc97'/%3E%3Cpath d='M25 22h14M25 29h10' stroke='%233ddc97' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>%%CSS%%</style>
+</head>
+<body>
+<div class="busy-bar" id="busyBar" hidden></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#151d28"/><rect x="18" y="10" width="28" height="44" rx="6" fill="none" stroke="#3ddc97" stroke-width="4"/><circle cx="32" cy="42" r="4" fill="#3ddc97"/><path d="M25 22h14M25 29h10" stroke="#3ddc97" stroke-width="4" stroke-linecap="round"/></svg>
+      <span>Token Companion</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="pill" id="statusPill" data-state="disconnected"><span class="dot"></span><span id="statusText">Not connected</span></div>
+  </header>
+
+  <!-- Unsupported -->
+  <section id="viewUnsupported" hidden>
+    <div class="card hero stack-lg">
+      <h1>This browser can't use Bluetooth</h1>
+      <p class="muted" id="unsupportedReason">Web Bluetooth isn't available here.</p>
+      <ul class="stack muted">
+        <li><b>Android:</b> use Chrome or Edge.</li>
+        <li><b>Windows, macOS, Linux, ChromeOS:</b> use Chrome or Edge.</li>
+        <li><b>iPhone / iPad:</b> Safari doesn't support Web Bluetooth. Use the free <b>Bluefy</b> browser app.</li>
+        <li>Firefox doesn't support Web Bluetooth.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Connect -->
+  <section id="viewConnect" hidden>
+    <div class="card hero stack-lg">
+      <svg class="device-art" width="120" height="96" viewBox="0 0 120 96" aria-hidden="true">
+        <rect x="8" y="18" width="104" height="60" rx="12" fill="#151d28" stroke="#2f3f54" stroke-width="2"/>
+        <rect x="20" y="28" width="62" height="40" rx="4" fill="#0b0f14"/>
+        <text x="51" y="54" text-anchor="middle" fill="#3ddc97" font-family="ui-monospace,monospace" font-size="13" font-weight="700">123 456</text>
+        <rect x="92" y="38" width="10" height="20" rx="3" fill="#2f3f54"/>
+        <path d="M60 6c6 0 11 2 15 6M60 0c9 0 17 3 23 9" stroke="#3ddc97" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
+      </svg>
+      <div class="stack">
+        <h1>Connect your token</h1>
+        <p class="muted">On the token, open <b>Config Via Bluetooth</b> from the main menu.</p>
+      </div>
+      <ol class="steps" id="steps">
+        <li class="active"><span>Tap <b>Connect</b> and choose <b>TOTP-Token</b>.</span></li>
+        <li><span>When asked to pair, type the <b>6-digit PIN</b> shown on the token.</span></li>
+        <li><span>Scan or type the <b>key</b> the token then shows.</span></li>
+      </ol>
+      <div class="stack">
+        <button class="btn btn-primary btn-block" id="btnConnect" type="button">Connect</button>
+        <button class="btn btn-ghost btn-block" id="btnReconnect" type="button" hidden>Reconnect to last token</button>
+      </div>
+      <p class="faint">Everything is encrypted end to end with a fresh key shown only on the token's screen. This page sends nothing to the internet.</p>
+    </div>
+  </section>
+
+  <!-- Key entry -->
+  <section id="viewKey" hidden>
+    <div class="card hero stack-lg">
+      <ol class="steps">
+        <li class="done"><span>Connected to <b id="keyDeviceName">TOTP-Token</b></span></li>
+        <li class="done"><span>Paired</span></li>
+        <li class="active"><span>Enter the key shown on the token. Press the token's <b>bottom button</b> to switch between QR code and text.</span></li>
+      </ol>
+      <form id="keyForm" class="stack" novalidate>
+        <button class="btn btn-primary btn-block" type="button" id="btnScanKey">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7 12h10"/></svg>
+          Scan key QR
+        </button>
+        <div class="row faint" aria-hidden="true"><span class="spacer"></span>or type it<span class="spacer"></span></div>
+        <div class="field">
+          <label for="keyInput">Key (32 characters, 0–9 and A–F)</label>
+          <input class="input key-input" id="keyInput" name="key" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" maxlength="48" placeholder="XXXXXXXX XXXXXXXX …" aria-describedby="keyErr">
+          <div class="row"><span class="error-text" id="keyErr"></span><span class="spacer"></span><span class="counter" id="keyCount">0 / 32</span></div>
+        </div>
+        <button class="btn btn-block" type="submit" id="btnSubmitKey">Unlock</button>
+      </form>
+      <button class="btn btn-ghost btn-block" type="button" data-action="disconnect">Cancel</button>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main id="viewMain" hidden>
+    <!-- Secrets tab -->
+    <section id="tabSecrets" role="tabpanel" aria-labelledby="tabBtnSecrets">
+      <div class="section-head">
+        <div><h2>Accounts</h2><p class="faint" id="secretsCount"></p></div>
+        <button class="btn btn-sm btn-ghost" type="button" id="btnRefresh" aria-label="Refresh list">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+          Refresh
+        </button>
+      </div>
+      <ul class="list" id="secretList" aria-label="Accounts on the token"></ul>
+      <button class="btn btn-primary fab" type="button" id="btnAdd">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Add
+      </button>
+    </section>
+
+    <!-- Wi-Fi tab -->
+    <section id="tabWifi" role="tabpanel" aria-labelledby="tabBtnWifi" hidden>
+      <div class="section-head"><div><h2>Wi-Fi</h2><p class="faint">Used by the token's <b>Sync Time</b> menu.</p></div></div>
+      <div class="stack-lg">
+        <div class="card row">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="muted"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg>
+          <div class="item-body"><div class="faint">Saved network</div><div class="item-title" id="wifiCurrent">…</div></div>
+        </div>
+
+        <div class="stack">
+          <div class="row"><h3 class="spacer">Nearby networks</h3>
+            <button class="btn btn-sm" type="button" id="btnWifiScan">Scan</button></div>
+          <p class="faint" id="wifiScanHint">The token scans with its own radio. This takes a few seconds, and Bluetooth may briefly pause.</p>
+          <ul class="list" id="wifiList" aria-label="Nearby networks"></ul>
+        </div>
+
+        <form class="card stack" id="wifiForm" novalidate>
+          <h3>Set network</h3>
+          <div class="field">
+            <label for="wifiSsid">Network name (SSID)</label>
+            <input class="input" id="wifiSsid" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="64" aria-describedby="wifiSsidErr">
+            <span class="error-text" id="wifiSsidErr"></span>
+          </div>
+          <div class="field">
+            <label for="wifiPass">Password</label>
+            <div class="input-wrap">
+              <input class="input" id="wifiPass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="128" aria-describedby="wifiPassErr wifiPassHint">
+              <button class="btn icon-btn" type="button" data-toggle-pw="wifiPass" aria-label="Show password" aria-pressed="false">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="hint" id="wifiPassHint">8–63 characters. Leave empty for an open network.</span>
+            <span class="error-text" id="wifiPassErr"></span>
+          </div>
+          <button class="btn btn-primary" type="submit" id="btnWifiSave">Save to token</button>
+          <p class="faint">The token never sends the saved password back.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Device tab -->
+    <section id="tabDevice" role="tabpanel" aria-labelledby="tabBtnDevice" hidden>
+      <div class="section-head"><div><h2>Device</h2><p class="faint" id="deviceName">TOTP-Token</p></div></div>
+      <div class="stack-lg">
+        <div class="card stack">
+          <h3>Clock</h3>
+          <div class="stat-grid">
+            <div class="stat"><div class="k">Token</div><div class="v" id="timeDevice">—</div></div>
+            <div class="stat"><div class="k">This phone</div><div class="v" id="timePhone">—</div></div>
+          </div>
+          <p class="faint" id="timeDrift">Codes are only correct if the token's clock is accurate.</p>
+          <div class="row-wrap">
+            <button class="btn btn-primary" type="button" id="btnSyncTime">Sync token to this device</button>
+            <button class="btn btn-ghost" type="button" id="btnReadTime">Re-check</button>
+          </div>
+        </div>
+        <div class="card stack">
+          <h3>Connection</h3>
+          <p class="muted">Encrypted with AES-128-GCM using a one-time key from the token's screen, on top of Bluetooth pairing.</p>
+          <button class="btn btn-danger" type="button" data-action="disconnect">Disconnect</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" id="tabbar" role="tablist" aria-label="Sections" hidden>
+  <div class="tabbar-inner">
+    <button class="tab" role="tab" id="tabBtnSecrets" aria-controls="tabSecrets" aria-selected="true" data-tab="Secrets">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Accounts</button>
+    <button class="tab" role="tab" id="tabBtnWifi" aria-controls="tabWifi" aria-selected="false" data-tab="Wifi" tabindex="-1">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg>Wi-Fi</button>
+    <button class="tab" role="tab" id="tabBtnDevice" aria-controls="tabDevice" aria-selected="false" data-tab="Device" tabindex="-1">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Device</button>
+  </div>
+</nav>
+
+<!-- Add dialog -->
+<dialog class="sheet" id="dlgAdd" aria-labelledby="dlgAddTitle">
+  <div class="dlg">
+    <div class="grabber" aria-hidden="true"></div>
+    <div class="dlg-head"><h2 id="dlgAddTitle">Add account</h2>
+      <button class="btn btn-ghost icon-btn" type="button" data-close aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body" id="addBody">
+      <div class="segmented" role="tablist" aria-label="How to add">
+        <button type="button" role="tab" aria-selected="true" data-mode="scan">Scan QR</button>
+        <button type="button" role="tab" aria-selected="false" data-mode="link">Paste link</button>
+        <button type="button" role="tab" aria-selected="false" data-mode="manual">Manual</button>
+      </div>
+
+      <div data-pane="scan" class="stack">
+        <p class="muted">Scan a setup QR code from a website, or a <b>Google Authenticator</b> export (⋮ → Transfer accounts → Export).</p>
+        <button class="btn btn-primary btn-block" type="button" id="btnScanOtp">Open camera</button>
+        <label class="btn btn-block" for="qrFile">Choose image or screenshot</label>
+        <input class="sr-only" type="file" id="qrFile" accept="image/*">
+      </div>
+
+      <form data-pane="link" class="stack" id="linkForm" hidden novalidate>
+        <div class="field">
+          <label for="linkInput">otpauth:// or otpauth-migration:// link</label>
+          <textarea class="input" id="linkInput" spellcheck="false" autocapitalize="off" placeholder="otpauth://totp/Example:me@example.com?secret=…" aria-describedby="linkErr"></textarea>
+          <span class="error-text" id="linkErr"></span>
+        </div>
+        <button class="btn btn-primary" type="submit">Read link</button>
+      </form>
+
+      <form data-pane="manual" class="stack" id="manualForm" hidden novalidate>
+        <div class="field">
+          <label for="manName">Name</label>
+          <input class="input" id="manName" autocomplete="off" placeholder="GitHub: me@example.com" aria-describedby="manNameErr">
+          <span class="error-text" id="manNameErr"></span>
+        </div>
+        <div class="field">
+          <label for="manSecret">Secret key (base32)</label>
+          <input class="input input-mono" id="manSecret" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="JBSW Y3DP EHPK 3PXP" aria-describedby="manSecretErr">
+          <span class="error-text" id="manSecretErr"></span>
+        </div>
+        <p class="faint">The token supports time-based codes with SHA-1, 6 digits and a 30-second period, which is what almost every site uses.</p>
+        <button class="btn btn-primary" type="submit" id="btnManualSave">Add to token</button>
+      </form>
+
+      <!-- Import review (shared by scan, image and link) -->
+      <div id="importReview" class="stack" hidden>
+        <div class="row"><h3 class="spacer" id="importTitle">Found accounts</h3><button class="btn btn-ghost btn-sm" type="button" id="btnImportBack">Back</button></div>
+        <p class="faint" id="importBatch" hidden></p>
+        <div class="stack" id="importList"></div>
+      </div>
+    </div>
+    <div class="dlg-foot" id="importFoot" hidden>
+      <button class="btn btn-primary" type="button" id="btnImport">Add selected</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Edit dialog -->
+<dialog class="sheet" id="dlgEdit" aria-labelledby="dlgEditTitle">
+  <form class="dlg" id="editForm" novalidate>
+    <div class="grabber" aria-hidden="true"></div>
+    <div class="dlg-head"><h2 id="dlgEditTitle">Edit account</h2>
+      <button class="btn btn-ghost icon-btn" type="button" data-close aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body">
+      <div class="field">
+        <label for="editName">Name</label>
+        <input class="input" id="editName" autocomplete="off" aria-describedby="editNameErr">
+        <span class="error-text" id="editNameErr"></span>
+      </div>
+
+      <details class="disclosure" id="revealBox">
+        <summary>Show secret key</summary>
+        <div class="inner" id="revealInner">
+          <div class="callout callout-warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><span>Anyone who sees this key can generate your codes.</span></div>
+          <button class="btn" type="button" id="btnReveal">Read from token</button>
+          <div id="revealed" class="stack" hidden>
+            <div class="secret-box"><code id="revealedSecret"></code>
+              <button class="btn btn-ghost icon-btn" type="button" id="btnCopySecret" aria-label="Copy secret"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></svg></button></div>
+            <div class="row"><span class="faint spacer">Current code (computed on this phone)</span>
+              <svg class="ring" viewBox="0 0 32 32" aria-hidden="true"><circle class="track" cx="16" cy="16" r="13"/><circle class="prog" id="totpRing" cx="16" cy="16" r="13"/></svg>
+              <span class="totp" id="totpCode">——— ———</span></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="disclosure" id="replaceBox">
+        <summary>Replace secret key</summary>
+        <div class="inner">
+          <p class="faint">Only needed if the site gave you a new key. Leave it empty to keep the current one.</p>
+          <div class="field">
+            <label for="editSecret">New secret key (base32)</label>
+            <input class="input input-mono" id="editSecret" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="editSecretErr">
+            <span class="error-text" id="editSecretErr"></span>
+          </div>
+        </div>
+      </details>
+
+      <button class="btn btn-danger" type="button" id="btnDelete">Delete from token</button>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn" type="button" data-close>Cancel</button>
+      <button class="btn btn-primary" type="submit" id="btnEditSave">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Confirm dialog -->
+<dialog id="dlgConfirm" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+  <div class="dlg">
+    <div class="dlg-body">
+      <h2 id="confirmTitle">Are you sure?</h2>
+      <p class="muted" id="confirmText"></p>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn" type="button" value="cancel" id="confirmNo">Cancel</button>
+      <button class="btn btn-danger" type="button" value="ok" id="confirmYes">Delete</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Scanner dialog -->
+<dialog class="sheet" id="dlgScan" aria-labelledby="scanTitle">
+  <div class="dlg">
+    <div class="grabber" aria-hidden="true"></div>
+    <div class="dlg-head"><h2 id="scanTitle">Scan QR code</h2>
+      <button class="btn btn-ghost icon-btn" type="button" data-close aria-label="Close camera"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dlg-body">
+      <div class="scanner"><video id="scanVideo" playsinline muted></video><div class="frame" aria-hidden="true"></div><div class="scanline" aria-hidden="true"></div></div>
+      <p class="scan-status" id="scanStatus" aria-live="polite">Starting camera…</p>
+      <select class="input" id="scanCamera" aria-label="Camera" hidden></select>
+    </div>
+  </div>
+</dialog>
+
+<script>%%JS%%</script>
+</body>
+</html>
